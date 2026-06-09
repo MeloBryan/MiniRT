@@ -6,7 +6,7 @@
 #    By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/09 17:09:36 by bmelo            ###   ########.fr        #
+#    Updated: 2026/06/09 17:30:33 by bmelo            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,8 @@ LIBFT_PATH		=	libft
 LIBFT			=	$(LIBFT_PATH)/libft.a
 
 FILES			=	main.c \
-				Window/window_handler.c \
+				Image/window_handler.c \
+				Image/render_scene.c \
 
 SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
 OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
