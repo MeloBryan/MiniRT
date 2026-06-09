@@ -6,13 +6,12 @@
 #    By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/08 14:55:03 by bmelo            ###   ########.fr        #
+#    Updated: 2026/06/09 17:09:36 by bmelo            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-
 NAME			=	MiniRT
-CC 				=	cc
+CC				=	cc
 CFLAGS			=	-O3 -Wall -Wextra -Werror -lm -Iincludes -Iminilibx-linux -MMD -MP
 
 SRC_DIR			=	src
@@ -23,10 +22,13 @@ MLX				=	$(MLX_PATH)/libmlx.a
 LIBFT_PATH		=	libft
 LIBFT			=	$(LIBFT_PATH)/libft.a
 
-FILES			=	main.c window_handler.c
+FILES			=	main.c \
+				Window/window_handler.c \
+
 SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
-OBJS_MANDATORY 	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
-DEPS			=	$(OBJS_MANDATORY:%.o=.d)
+OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
+
+DEPS			=	$(OBJS_MANDATORY:%.o=%.d)
 
 LIBS			=	$(LIBFT) $(MLX) -lXext -lX11 -lm
 
@@ -42,7 +44,7 @@ $(NAME): $(MLX) $(LIBFT) $(OBJS_MANDATORY)
 	done
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(LIBFT):
