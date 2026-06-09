@@ -6,11 +6,11 @@
 /*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:01 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/08 15:02:25 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/09 15:43:15 by bmelo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "MiniRT.h"
+#include "miniRT.h"
 
 int	main(int ac, char **av)
 {

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MiniRT.h                                           :+:      :+:    :+:   */
+/*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:32 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/08 16:11:44 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/09 16:24:46 by bmelo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdbool.h>
-# include "Keys.h"
-# include "../minilibx_linux/mlx.h"
+# include "keys.h"
+# include "structures.h"
+# include "vector.h"
 # include "../libft/includes/libft.h"
 
 # define WIDTH 800
@@ -44,12 +45,6 @@ typedef struct s_data
 	double	zoom;
 }				t_data;
 
-typedef struct s_vector
-{
-	double	x;
-	double	y;
-	double	z;
-}				t_vector;
 
 //Windows Functions
 void	close_win(t_data *data);

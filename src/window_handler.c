@@ -6,11 +6,11 @@
 /*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:39:18 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/08 15:03:46 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/09 15:43:12 by bmelo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "MiniRT.h"
+#include "miniRT.h"
 
 void	open_win(t_data *data)
 {
