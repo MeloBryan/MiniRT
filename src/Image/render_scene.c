@@ -1,35 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   render_scene.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/08 14:21:01 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 17:11:54 by bmelo            ###   ########.fr       */
+/*   Created: 2026/06/09 16:41:00 by bmelo             #+#    #+#             */
+/*   Updated: 2026/06/09 17:48:08 by bmelo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-int	main(int ac, char **av)
+void	render_scene(t_data *data)
 {
-	t_data	data;
-	(void)av;
-	(void)ac;
+	int		x;
+	int		y;
 
-	ft_bzero(&data, sizeof(t_data));
-	data.mlx = NULL;
-	data.win = NULL;
-	open_win(&data);
-	if (data.mlx)
+	y = 0;
+	while (y < HEIGHT)
 	{
-		if (data.img)
-			mlx_destroy_image(data.mlx, data.img);
-		if (data.win)
-			mlx_destroy_window(data.mlx, data.win);
-		mlx_destroy_display(data.mlx);
-		free(data.mlx);
+		x = 0;
+		printf("Scanlines remaining : %d\n", (HEIGHT - y));
+		while (x < WIDTH)
+		{
+			my_mlx_pixel_put(data, x, y, (x * 255 / WIDTH) << 16);
+			x++;
+		}
+		y++;
 	}
-	return (0);
+}
+
+void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
+{
+	char	*dst;
+
+	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	*(unsigned int *)dst = color;
 }
