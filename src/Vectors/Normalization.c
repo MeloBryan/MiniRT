@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Normalization.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:09:23 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 16:10:48 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/12 00:35:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ t_vector	normalization(t_vector A)
 	double		length;
 
 	length = vec_length(A);
+	if (length == 0)
+		return (A);
 	res.x = A.x / length;
 	res.y = A.y / length;
 	res.z = A.z / length;

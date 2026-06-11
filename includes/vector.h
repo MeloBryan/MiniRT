@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 15:41:12 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/11 23:43:40 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/12 00:04:05 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,6 @@ t_vector	mul_vec(t_vector A, double i);
 double		dot_product(t_vector A, t_vector B);
 double		vec_length(t_vector A);
 t_vector	normalization(t_vector A);
+t_vector    cross_vec(t_vector A, t_vector B);
 
 #endif

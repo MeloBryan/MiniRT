@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:01 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 17:11:54 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/12 00:39:51 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ int	main(int ac, char **av)
 	ft_bzero(&data, sizeof(t_data));
 	data.mlx = NULL;
 	data.win = NULL;
+	data.cam_pos.x = 0.0;  data.cam_pos.y = 0.0;  data.cam_pos.z = 0.0;
+    data.cam_dir.x = 0.0; data.cam_dir.y = 0.0;  data.cam_dir.z = 1.0;
 	open_win(&data);
 	if (data.mlx)
 	{

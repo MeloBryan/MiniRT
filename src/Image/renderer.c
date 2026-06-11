@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:41:00 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/11 23:57:06 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/12 00:34:26 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,53 +17,56 @@ void	render_scene(t_data *data)
 	int			x;
 	int			y;
 	double		aspect_ratio;
+	t_vector	f;
+	t_vector	u;
+	t_vector	r;
 	t_vector	screen;
 	t_ray		ray;
 
 	aspect_ratio = (double)WIDTH / (double)HEIGHT;
-	y = -1;
-	while (y++ < HEIGHT)
+	update_camera_vectors(&f, &r, &u, data);
+	y = 0;
+	while (y < HEIGHT)
 	{
-		x = -1;
-		while (x++ < WIDTH)
+		x = 0;
+		while (x < WIDTH)
 		{
 			screen.x = (2.0 * ((double)x / WIDTH) - 1.0) * aspect_ratio;
 			screen.y = 1.0 + 2.0 * ((double)y / HEIGHT);
-			ray = ray_init(screen, data);
-			int r = (int)((ray.direction.x + 1.0) * 127.5);
+			ray = ray_init(screen, r, u, f, data);
+			int re = (int)((ray.direction.x + 1.0) * 127.5);
 			int g = (int)((ray.direction.y + 1.0) * 127.5);
 			int b = (int)((ray.direction.z + 1.0) * 127.5);
-			int color = (r << 16) | (g << 8) | b;
+			int color = (re << 16) | (g << 8) | b;
 			my_mlx_pixel_put(data, x, y, color);
+			x++;
 		}
+		y++;
 	}
 }
 
-t_ray	ray_init(t_vector screen, t_data *data)
+t_ray	ray_init(t_vector screen, t_vector r, t_vector u, t_vector f, t_data *data)
 {
 	t_ray	ray;
 
 	ray.origin = data->cam_pos;
-	ray.direction.x = screen.x;
-	ray.direction.y = screen.y;
-	ray.direction.z = 1.0;
+	ray.direction.x = (screen.x * r.x) + (screen.y * u.x) + f.x;
+	ray.direction.y = (screen.x * r.y) + (screen.y * u.y) + f.y;
+	ray.direction.z= (screen.x * r.z) + (screen.y * u.z) + f.z;
 	ray.direction = normalization(ray.direction);
 	return (ray);
 }
 
-t_vector	update_camera_vectors(t_vector camera, t_data *data)
+void	update_camera_vectors(t_vector *f, t_vector *r, t_vector *u, t_data *data)
 {
-	t_vector	forward;
-	t_vector	right;
-	t_vector	up;
 	t_vector	world_up;
 
-	forward = normalization(data->cam_pos);
+	*f = normalization(data->cam_dir);
 	world_up.x = 0.0;
 	world_up.y = 1.0;
 	world_up.z = 0.0;
-	right = normalization(cross_vec(world_up, forward));
-	up = cross_vec(forward, right);
+	*r = normalization(cross_vec(world_up, *f));
+	*u = cross_vec(*f, *r);
 }
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color)

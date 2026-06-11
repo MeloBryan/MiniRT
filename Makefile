@@ -6,7 +6,7 @@
 #    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/10 05:13:18 by marvin           ###   ########.fr        #
+#    Updated: 2026/06/12 00:15:40 by marvin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,8 @@ FILES			=	main.c \
 				Image/renderer.c \
 				Vectors/Normalization.c \
 				Vectors/Vec_Length.c \
-				Vectors/Dot_Product.c
+				Vectors/Dot_Product.c \
+				Vectors/Cross_Vec.c \
 
 SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
 OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
