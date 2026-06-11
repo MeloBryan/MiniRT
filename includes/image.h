@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/10 05:09:51 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/11 23:47:05 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,6 @@ void	open_win(t_data *data);
 void	handle_input(int key, t_data *data);
 void	render_scene(t_data *data);
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
+t_ray	ray_init(t_vector screen, t_data *data);
 
 #endif
