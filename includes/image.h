@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/12 00:20:40 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/12 00:44:36 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,6 @@ void	render_scene(t_data *data);
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
 t_ray	ray_init(t_vector screen, t_vector r, t_vector u, t_vector f, t_data *data);
 void	update_camera_vectors(t_vector *f, t_vector *r, t_vector *u, t_data *data);
+int		 hit_sphere_hardcoded(t_ray ray);
 
 #endif
