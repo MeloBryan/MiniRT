@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:32 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/11 23:55:10 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/13 01:06:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include "structures.h"
 # include "vector.h"
 # include "image.h"
+# include "parsing.h"
 # include "../minilibx_linux/mlx.h"
 # include "../libft/includes/libft.h"
 

@@ -6,7 +6,7 @@
 #    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/12 00:15:40 by marvin           ###   ########.fr        #
+#    Updated: 2026/06/13 01:16:55 by marvin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,9 @@ FILES			=	main.c \
 				Vectors/Vec_Length.c \
 				Vectors/Dot_Product.c \
 				Vectors/Cross_Vec.c \
+				Parsing/free.c \
+				Parsing/parse_ambient.c \
+				Parsing/parse_line.c \
 
 SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
 OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
