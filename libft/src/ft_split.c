@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 13:26:54 by bmelo             #+#    #+#             */
-/*   Updated: 2026/02/21 10:52:34 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/06/13 00:47:04 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static char	**free_all(char **tab, int i)
 	while (i >= 0)
 	{
 		free(tab[i]);
-		i++;
+		i--;
 	}
 	free(tab);
 	return (NULL);
