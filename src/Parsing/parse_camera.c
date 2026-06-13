@@ -29,12 +29,12 @@ void    parse_camera(char *line, t_data *data)
         printf("  tokens[%d] = '%s'\n", k, tokens[k]);
     if (!tokens)
         return ;
-    if (matrix_length(tokens) != 3)
+    if (matrix_length(tokens) != 4)
     {
         printf("Error\nInvalid camera format\n");
         return (free_matrix(tokens));
     }
-    pos_tokens = ft_split(tokens[0], ',');
+    pos_tokens = ft_split(tokens[1], ',');
     if (matrix_length(pos_tokens) != 3)
     {
         printf("Error\nPOSITION must have 3 values (x,y,z)\n");
@@ -43,7 +43,7 @@ void    parse_camera(char *line, t_data *data)
     data->cam_pos.x = ft_atof(pos_tokens[0]);
     data->cam_pos.y = ft_atof(pos_tokens[1]);
     data->cam_pos.z = ft_atof(pos_tokens[2]);
-    dir_tokens = ft_split(tokens[1], ',');
+    dir_tokens = ft_split(tokens[2], ',');
     if (matrix_length(dir_tokens) != 3)
     {
         printf("Error\nDIRECTION must have 3 values (x,y,z)\n");
@@ -59,7 +59,7 @@ void    parse_camera(char *line, t_data *data)
         printf("Error\nInvalid direction value(must be between -1 and 1)\n");
         return (free_matrix(tokens), free_matrix(pos_tokens), free_matrix(dir_tokens));
     }
-    data->cam_fov = ft_atof(tokens[2]);
+    data->cam_fov = ft_atof(tokens[3]);
     if (data->cam_fov < 0 || data->cam_fov > 180)
     {
         printf("Error\nFOV velue must be between 0 and 180\n");
