@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/13 01:45:27 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/13 02:14:17 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ typedef struct s_data
 	int			light_already_set;
 	int			ambient_color;
 	double		ambient_ratio;
+	t_vector	light_pos;
+	double		light_ratio;
+	int			light_color;
 }				t_data;
 
 void	close_win(t_data *data);

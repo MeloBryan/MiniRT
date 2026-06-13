@@ -31,40 +31,30 @@ void    parse_ambient(char *line, t_data *data)
         printf("  tokens[%d] = '%s'\n", k, tokens[k]);
     if (!tokens)
         return ;
-    if (matrix_length(tokens) != 2)
+    if (matrix_length(tokens) != 3)
     {
         printf("Error\nInvalid Ambient light format\n");
-        return ;
+        return (free_matrix(tokens));
     }
-    data->ambient_ratio = ft_atof(tokens[0]);
+    data->ambient_ratio = ft_atof(tokens[1]);
     if (data->ambient_ratio < 0.0 || data->ambient_ratio > 1.0)
     {
         printf("Error\nAmbient ratio must be between 0.0 and 1.0\n");
-        return ;
+        return (free_matrix(tokens));
     }
-    rgb_tokens = ft_split(tokens[1], ',');
+    rgb_tokens = ft_split(tokens[2], ',');
     if (matrix_length(rgb_tokens) != 3)
     {
         printf("Error\nAmbient RGB must have 3 values (R,G,B)\n");
-        return ;
+        return (free_matrix(tokens), free_matrix(rgb_tokens));
     }
-    r = ft_atof(rgb_tokens[0]);
-    if (r > 255 || r < 0)
+    r = ft_atoi(rgb_tokens[0]);
+    g = ft_atoi(rgb_tokens[1]);
+    b = ft_atoi(rgb_tokens[2]);
+    if (r > 255 || r < 0 || g > 255 || g < 0 || b > 255 || b < 0)
     {
         printf("Error\nRGB color values must be between 0 and 255\n");
-        return ;
-    }
-    g = ft_atof(rgb_tokens[1]);
-    if (g > 255 || g < 0)
-    {
-        printf("Error\nRGB color values must be between 0 and 255\n");
-        return ;
-    }
-    b = ft_atof(rgb_tokens[2]);
-    if (b > 255 || b < 0)
-    {
-        printf("Error\nRGB color values must be between 0 and 255\n");
-        return ;
+        return (free_matrix(tokens), free_matrix(rgb_tokens));
     }
     data->ambient_color = (r << 16) | (g << 8) | b;
     data->ambient_already_set = 1;
