@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/13 01:05:51 by marvin           ###   ########.fr       */
+/*   Updated: 2026/06/13 01:45:27 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ typedef struct s_data
 	int			line_length;
 	int			endian;
 	int			key[65536];
-	int			ambient_light_already_set;
+	int			ambient_already_set;
+	int			camera_already_set;
+	int			light_already_set;
 	int			ambient_color;
 	double		ambient_ratio;
 }				t_data;
