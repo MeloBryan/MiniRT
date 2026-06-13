@@ -38,8 +38,8 @@ void    parse_line(char *line , t_data *data)
         return ;
     else if (line[0] == 'A' && (line[1] == ' ' || line[1] == '\t'))
         parse_ambient(line + 1, data);
-    // else if (line[0] == 'C' && (line[1] == ' ' || line[1] == '\t'))
-    //     parse_camera(line + 1, data);
+    else if (line[0] == 'C' && (line[1] == ' ' || line[1] == '\t'))
+         parse_camera(line + 1, data);
     // else if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
     //     parse_light(line + 1, data);
     // else if (line[0] == 's' && line[1] == 'p' && (line[2] == ' ' || line[2] == '\t'))

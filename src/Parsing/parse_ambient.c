@@ -20,7 +20,7 @@ void    parse_ambient(char *line, t_data *data)
     int     g;
     int     b;
 
-    if (data->ambient_light_already_set == 1)
+    if (data->ambient_already_set == 1)
     {
         printf("Error\nMultiple Ambient lights detected\n");
         return ;
@@ -67,7 +67,7 @@ void    parse_ambient(char *line, t_data *data)
         return ;
     }
     data->ambient_color = (r << 16) | (g << 8) | b;
-    data->ambient_light_already_set = 1;
+    data->ambient_already_set = 1;
     free_matrix(tokens);
     free_matrix(rgb_tokens);
 }

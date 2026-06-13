@@ -6,7 +6,7 @@
 #    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/13 01:16:55 by marvin           ###   ########.fr        #
+#    Updated: 2026/06/13 02:05:04 by marvin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ FILES			=	main.c \
 				Parsing/free.c \
 				Parsing/parse_ambient.c \
 				Parsing/parse_line.c \
+				Parsing/parse_camera.c \
 
 SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
 OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
