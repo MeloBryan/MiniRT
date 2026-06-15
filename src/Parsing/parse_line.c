@@ -23,25 +23,32 @@ int parse_file(char *file_name, t_data *data)
     while ((line = get_next_line(fd)) != NULL)
     {
         if (line && line[0] != '\n')
-            parse_line(line, data);
+        {
+            if (parse_line(line, data) == 0)
+            {
+                free(line);
+                close(fd);
+                return (0);
+            }
+        }
         free(line);
     }
     close(fd);
     return (1);
 }
 
-void    parse_line(char *line , t_data *data)
+int    parse_line(char *line , t_data *data)
 {
     while (*line == ' ' || *line == '\t')
         line++;
     if (*line == '\0' || *line == '\n' || *line == '#')
-        return ;
+        return (1);
     else if (line[0] == 'A' && (line[1] == ' ' || line[1] == '\t'))
-        parse_ambient(line + 1, data);
+        return (parse_ambient(line, data));
     else if (line[0] == 'C' && (line[1] == ' ' || line[1] == '\t'))
-         parse_camera(line + 1, data);
-    // else if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
-    //     parse_light(line + 1, data);
+        return (parse_camera(line, data));
+    else if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
+        return (parse_light(line, data));
     // else if (line[0] == 's' && line[1] == 'p' && (line[2] == ' ' || line[2] == '\t'))
     //     parse_sphere(line + 2, data);
     // else if (line[0] == 'p' && line[1] == 'l' && (line[2] == ' ' || line[2] == '\t'))
@@ -51,6 +58,7 @@ void    parse_line(char *line , t_data *data)
     else
     {
         printf("Error\nUnknown element identifier : %c\n", line[0]);
+        return (0);
         //set flag pour erreur
     }
 }
