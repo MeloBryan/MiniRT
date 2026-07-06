@@ -1,0 +1,29 @@
+# Binaries
+MiniRT
+miniRT
+
+# Object files and dependency files
+objs/
+*.o
+*.d
+*.a
+
+# MiniLibX build artifacts (if you vendor the sources)
+minilibx_linux
+minilibx_linux/*.o
+minilibx_linux/*.a
+minilibx_linux/*.gen
+minilibx_linux/Makefile.gen
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Valgrind / debug leftovers
+vgcore.*
+core
+*.log

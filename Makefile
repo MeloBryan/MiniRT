@@ -17,7 +17,7 @@ CFLAGS			=	-O3 -Wall -Wextra -Werror -lm -Iincludes -Iminilibx-linux -MMD -MP
 SRC_DIR			=	src
 OBJ_DIR			=	objs
 
-MLX_PATH		=	minilibx_linux
+MLX_PATH		=	minilibx-linux
 MLX				=	$(MLX_PATH)/libmlx.a
 LIBFT_PATH		=	libft
 LIBFT			=	$(LIBFT_PATH)/libft.a
