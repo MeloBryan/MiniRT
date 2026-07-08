@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parse_light.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/13 02:12:04 by marvin            #+#    #+#             */
-/*   Updated: 2026/06/13 02:12:04 by marvin           ###   ########.fr       */
+/*   Created: 2026/07/08 14:09:11 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/08 14:09:11 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-void    parse_light(char *line, t_data *data)
+int parse_light(char *line, t_data *data)
 {
     char    **tokens;
     char    **pos_tokens;
@@ -24,24 +24,24 @@ void    parse_light(char *line, t_data *data)
     if (data->light_already_set == 1)
     {
         printf("Error\nMultiple light detected\n");
-        return ;
+        return (0);
     }
     tokens = ft_split_spaces(line);
     printf("DEBUG: matrix_length = %d\n", matrix_length(tokens));
     for (int k = 0; tokens && tokens[k]; k++)
         printf("  tokens[%d] = '%s'\n", k, tokens[k]);
     if (!tokens)
-        return ;
+        return (0);
     if (matrix_length(tokens) != 4)
     {
         printf("Error\nInvalid light format\n");
-        return (free_matrix(tokens));
+        return (free_matrix(tokens), 0);
     }
     pos_tokens = ft_split(tokens[1], ',');
     if (matrix_length(pos_tokens) != 3)
     {
         printf("Error\nPOSITION must have 3 values (x,y,z)\n");
-        return (free_matrix(tokens), free_matrix(pos_tokens));
+        return (free_matrix(tokens), free_matrix(pos_tokens), 0);
     }
     data->light_pos.x = ft_atof(pos_tokens[0]);
     data->light_pos.y = ft_atof(pos_tokens[1]);
@@ -50,13 +50,13 @@ void    parse_light(char *line, t_data *data)
     if (data->light_ratio < 0.0 || data->light_ratio > 1.0)
     {
         printf("Error\nInvalid light ratio value(must be between 0 and 1)\n");
-        return (free_matrix(tokens), free_matrix(pos_tokens));
+        return (free_matrix(tokens), free_matrix(pos_tokens), 0);
     }
     color_tokens = ft_split(tokens[3], ',');
     if (matrix_length(color_tokens) != 3)
     {
         printf("Error\nLight RGB must have 3 values (R,G,B)\n");
-        return (free_matrix(tokens), free_matrix(pos_tokens), free_matrix(color_tokens));
+        return (free_matrix(tokens), free_matrix(pos_tokens), free_matrix(color_tokens), 0);
     }
     r = ft_atoi(color_tokens[0]);
     g = ft_atoi(color_tokens[1]);
@@ -64,11 +64,12 @@ void    parse_light(char *line, t_data *data)
     if (r > 255 || r < 0 || g > 255 || g < 0 || b > 255 || b < 0)
     {
         printf("Error\nRGB color values must be between 0 and 255\n");
-        return (free_matrix(tokens), free_matrix(pos_tokens), free_matrix(color_tokens));
+        return (free_matrix(tokens), free_matrix(pos_tokens), free_matrix(color_tokens), 0);
     }
     data->light_color = (r << 16) | (g << 8) | b;
     data->light_already_set = 1;
     free_matrix(tokens);
     free_matrix(pos_tokens);
     free_matrix(color_tokens);
+    return (1);
 }
