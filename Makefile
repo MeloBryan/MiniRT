@@ -3,91 +3,147 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
+#    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/06/13 02:29:53 by marvin           ###   ########.fr        #
+#    Updated: 2026/07/08 14:54:44 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME			=	MiniRT
-CC				=	cc
-CFLAGS			=	-O3 -Wall -Wextra -Werror -lm -Iincludes -Iminilibx-linux -MMD -MP
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
+#    Updated: 2026/07/08 00:00:00 by bmelo             ###   ########.fr       #
+#                                                                              #
+# **************************************************************************** #
 
-SRC_DIR			=	src
-OBJ_DIR			=	objs
+# ---------------------------------------------------------------------------- #
+#   PROGRAM                                                                    #
+# ---------------------------------------------------------------------------- #
 
-MLX_PATH		=	minilibx-linux
-MLX				=	$(MLX_PATH)/libmlx.a
-LIBFT_PATH		=	libft
-LIBFT			=	$(LIBFT_PATH)/libft.a
+NAME        := MiniRT
 
-FILES			=	main.c \
-				Image/window_handler.c \
-				Image/renderer.c \
-				Vectors/Normalization.c \
-				Vectors/Vec_Length.c \
-				Vectors/Dot_Product.c \
-				Vectors/Cross_Vec.c \
-				Parsing/free.c \
-				Parsing/parse_ambient.c \
-				Parsing/parse_line.c \
-				Parsing/parse_camera.c \
-				Parsing/parse_light.c \
+# ---------------------------------------------------------------------------- #
+#   LIBRARIES                                                                  #
+# ---------------------------------------------------------------------------- #
 
-SRCS			=	$(addprefix $(SRC_DIR)/, $(FILES))
-OBJS_MANDATORY	=	$(FILES:%.c=$(OBJ_DIR)/%.o)
+LIBFT_DIR   := libft
+LIBFT       := $(LIBFT_DIR)/libft.a
 
-DEPS			=	$(OBJS_MANDATORY:%.o=%.d)
+MLX_DIR     := minilibx_linux
+MLX         := $(MLX_DIR)/libmlx.a
 
-LIBS			=	$(LIBFT) $(MLX) -lXext -lX11 -lm
+# ---------------------------------------------------------------------------- #
+#   COMPILER & FLAGS                                                           #
+#                                                                              #
+#   CFLAGS   : compilation only                                                #
+#   CPPFLAGS : preprocessor (include paths, dependency generation)             #
+#   LDFLAGS  : linker search paths                                             #
+#   LDLIBS   : libraries to link against (-lm = math, X11/Xext = MiniLibX)     #
+# ---------------------------------------------------------------------------- #
+
+CC          := cc
+CFLAGS      := -Wall -Wextra -Werror -O3
+CPPFLAGS    := -Iincludes -I$(MLX_DIR) -MMD -MP
+LDFLAGS     := -L$(LIBFT_DIR) -L$(MLX_DIR)
+LDLIBS      := -lft -lmlx -lXext -lX11 -lm
+
+# ---------------------------------------------------------------------------- #
+#   SOURCES & OBJECTS                                                          #
+#                                                                              #
+#   Objects mirror src/ inside objs/ (src/a/b.c -> objs/a/b.o).                #
+#   .d files are generated next to objects by -MMD -MP and included at the     #
+#   bottom, so editing a header recompiles exactly the files that use it.      #
+# ---------------------------------------------------------------------------- #
+
+SRC_DIR     := src
+OBJ_DIR     := objs
+
+SRC         := main.c \
+               Image/window_handler.c \
+               Image/renderer.c \
+               Parsing/parse_line.c \
+               Parsing/parse_ambient.c \
+               Parsing/parse_camera.c \
+               Parsing/parse_light.c \
+               Parsing/free.c \
+               Vectors/Addition.c \
+               Vectors/Soustraction.c \
+               Vectors/Multiplication.c \
+               Vectors/Normalization.c \
+               Vectors/Vec_Length.c \
+               Vectors/Dot_Product.c \
+               Vectors/Cross_Vec.c
+
+SRCS        := $(addprefix $(SRC_DIR)/, $(SRC))
+OBJS        := $(SRC:%.c=$(OBJ_DIR)/%.o)
+DEPS        := $(OBJS:%.o=%.d)
+
+# ---------------------------------------------------------------------------- #
+#   TESTS (not graded, see subject: Common Instructions)                       #
+# ---------------------------------------------------------------------------- #
+
+TEST_NAME   := test_parsing
+TEST_SRC    := tests/test_parsing.c
+OBJS_NOMAIN := $(filter-out $(OBJ_DIR)/main.o, $(OBJS))
+
+# ---------------------------------------------------------------------------- #
+#   RULES                                                                      #
+# ---------------------------------------------------------------------------- #
 
 all: $(NAME)
 
-$(NAME): $(MLX) $(LIBFT) $(OBJS_MANDATORY)
-	@$(CC) $(CFLAGS) $(OBJS_MANDATORY) $(LIBS) -o $(NAME)
-	@lines=$$(tput lines); \
-	while [ $$lines -gt 0 ]; do \
-		printf "\033[1A\033[K"; \
-		sleep 0.05; \
-		lines=$$((lines - 1)); \
-	done
+# Link. $(NAME) depends on real files only -> no relink when nothing changed.
+$(NAME): $(LIBFT) $(MLX) $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $(NAME)
+	@echo "==> $(NAME) ready"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+# Compile. '| $(OBJ_DIR)' is an order-only prerequisite: the directory must
+# exist, but its timestamp never triggers a rebuild.
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
 
 $(LIBFT):
-	@echo "Compilation de la Libft ..."
-	@$(MAKE) -C $(LIBFT_PATH)
+	@echo "==> building libft"
+	@$(MAKE) -C $(LIBFT_DIR)
 
+# Build only the library (Makefile.gen), not MiniLibX's demo programs:
+# the demos need extra libs (-lbsd) and their failure would break our build.
 $(MLX):
-	@echo "Compilation de la Minilibx ..."
-	-@$(MAKE) -C $(MLX_PATH) all
+	@echo "==> building minilibx"
+	@$(MAKE) -C $(MLX_DIR) -f Makefile.gen all
+
+bonus: all
+
+test: $(LIBFT) $(MLX) $(OBJS_NOMAIN)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TEST_SRC) $(OBJS_NOMAIN) \
+		$(LDFLAGS) $(LDLIBS) -o $(TEST_NAME)
+	@echo "==> ./$(TEST_NAME) ready"
 
 clean:
 	rm -rf $(OBJ_DIR)
-	@$(MAKE) -C $(LIBFT_PATH) clean
-	@$(MAKE) -C $(MLX_PATH) clean
-	@lines=$$(tput lines); \
-	while [ $$lines -gt 0 ]; do \
-		printf "\033[1A\033[K"; \
-		sleep 0.05; \
-		lines=$$((lines - 1)); \
-	done
+	@$(MAKE) -C $(LIBFT_DIR) clean
+	@if [ -f $(MLX_DIR)/Makefile.gen ]; then \
+		$(MAKE) -C $(MLX_DIR) -f Makefile.gen clean; fi
+	@echo "==> objects removed"
 
 fclean: clean
-	rm -f $(NAME)
-	@$(MAKE) -C $(LIBFT_PATH) fclean
-	rm -f $(MLX_PATH)/*.gen
-	@lines=$$(tput lines); \
-	while [ $$lines -gt 0 ]; do \
-		printf "\033[1A\033[K"; \
-		sleep 0.05; \
-		lines=$$((lines - 1)); \
-	done
+	rm -f $(NAME) $(TEST_NAME) $(TEST_NAME).d
+	@$(MAKE) -C $(LIBFT_DIR) fclean
+	@echo "==> binaries removed"
 
 re: fclean all
 
-.PHONY: all bonus clean fclean re
+.PHONY: all bonus test clean fclean re
+
+# Auto-generated header dependencies ('-' = ignore if missing).
 -include $(DEPS)
