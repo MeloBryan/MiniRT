@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   structures.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:13:35 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 16:27:51 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/07/08 15:22:21 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,19 @@ typedef struct s_ray
 	t_vector	direction;
 }				t_ray;
 
+typedef struct s_basis
+{
+	t_vector	f;
+	t_vector	r;
+	t_vector	u;
+}				t_basis;
+
 typedef struct s_camera
 {
 	t_vector	position;
 	t_vector	orientation;
 	double		fov;
-}			t_camera;
+}				t_camera;
 
 typedef struct s_sphere
 {

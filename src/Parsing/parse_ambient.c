@@ -5,60 +5,29 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/08 14:08:09 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/08 14:08:09 by edefoy           ###   ########.fr       */
+/*   Created: 2026/07/08 15:14:08 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/08 15:14:08 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-int parse_ambient(char *line, t_data *data)
+int	parse_ambient(char *line, t_data *data)
 {
-    char    **tokens;
-    char    **rgb_tokens;
-    int     r;
-    int     g;
-    int     b;
+	char	**tokens;
 
-    if (data->ambient_already_set == 1)
-    {
-        printf("Error\nMultiple Ambient lights detected\n");
-        return (0);
-    }
-    tokens = ft_split_spaces(line);
-    printf("DEBUG: matrix_length = %d\n", matrix_length(tokens));
-    for (int k = 0; tokens && tokens[k]; k++)
-        printf("  tokens[%d] = '%s'\n", k, tokens[k]);
-    if (!tokens)
-        return (0);
-    if (matrix_length(tokens) != 3)
-    {
-        printf("Error\nInvalid Ambient light format\n");
-        return (free_matrix(tokens), 0);
-    }
-    data->ambient_ratio = ft_atof(tokens[1]);
-    if (data->ambient_ratio < 0.0 || data->ambient_ratio > 1.0)
-    {
-        printf("Error\nAmbient ratio must be between 0.0 and 1.0\n");
-        return (free_matrix(tokens), 0);
-    }
-    rgb_tokens = ft_split(tokens[2], ',');
-    if (matrix_length(rgb_tokens) != 3)
-    {
-        printf("Error\nAmbient RGB must have 3 values (R,G,B)\n");
-        return (free_matrix(tokens), free_matrix(rgb_tokens), 0);
-    }
-    r = ft_atoi(rgb_tokens[0]);
-    g = ft_atoi(rgb_tokens[1]);
-    b = ft_atoi(rgb_tokens[2]);
-    if (r > 255 || r < 0 || g > 255 || g < 0 || b > 255 || b < 0)
-    {
-        printf("Error\nRGB color values must be between 0 and 255\n");
-        return (free_matrix(tokens), free_matrix(rgb_tokens), 0);
-    }
-    data->ambient_color = (r << 16) | (g << 8) | b;
-    data->ambient_already_set = 1;
-    free_matrix(tokens);
-    free_matrix(rgb_tokens);
-    return (1);
+	if (data->ambient_already_set == 1)
+		return (rt_error("Multiple Ambient lights detected"));
+	tokens = ft_split_spaces(line);
+	if (matrix_length(tokens) != 3)
+		return (free_matrix(tokens), rt_error("Invalid Ambient light format"));
+	data->ambient_ratio = ft_atof(tokens[1]);
+	if (data->ambient_ratio < 0.0 || data->ambient_ratio > 1.0)
+		return (free_matrix(tokens),
+			rt_error("Ambient ratio must be between 0.0 and 1.0"));
+	if (!parse_rgb(tokens[2], &data->ambient_color))
+		return (free_matrix(tokens),
+			rt_error("RGB color values must be between 0 and 255"));
+	data->ambient_already_set = 1;
+	return (free_matrix(tokens), 1);
 }

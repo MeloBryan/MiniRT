@@ -3,42 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/13 01:07:15 by marvin            #+#    #+#             */
-/*   Updated: 2026/06/13 01:07:15 by marvin           ###   ########.fr       */
+/*   Created: 2026/07/08 15:16:25 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/08 15:16:25 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-void    free_data(t_data *data)
+void	free_data(t_data *data)
 {
-    if (!data)
-        return ;
-    if (data->img)
-        mlx_destroy_image(data->mlx, data->img);
-    if (data->win)
-        mlx_destroy_window(data->mlx, data->win);
-    if (data->mlx)
-    {
-        mlx_destroy_display(data->mlx);
-        free(data->mlx);
-        data->mlx = NULL;
-    }
+	if (!data)
+		return ;
+	if (data->img)
+		mlx_destroy_image(data->mlx, data->img);
+	if (data->win)
+		mlx_destroy_window(data->mlx, data->win);
+	if (data->mlx)
+	{
+		mlx_destroy_display(data->mlx);
+		free(data->mlx);
+		data->mlx = NULL;
+	}
 }
 
-void    free_matrix(char **matrix)
+void	free_matrix(char **matrix)
 {
-    int i;
+	int	i;
 
-    if (!matrix)
-        return ;
-    i = 0;
-    while (matrix[i])
-    {
-        free(matrix[i]);
-        i++;
-    }
-    free(matrix);
+	if (!matrix)
+		return ;
+	i = 0;
+	while (matrix[i])
+	{
+		free(matrix[i]);
+		i++;
+	}
+	free(matrix);
 }

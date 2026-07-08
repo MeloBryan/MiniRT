@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Addition.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:09:54 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 16:10:27 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/07/08 15:27:08 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vector.h"
 
-t_vector	add_vec(t_vector A, t_vector B)
+t_vector	add_vec(t_vector a, t_vector b)
 {
 	t_vector	res;
 
-	res.x = B.x + A.x;
-	res.y = B.y + A.y;
-	res.z = B.z + A.z;
+	res.x = a.x + b.x;
+	res.y = a.y + b.y;
+	res.z = a.z + b.z;
 	return (res);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 15:41:12 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/12 00:04:05 by marvin           ###   ########.fr       */
+/*   Updated: 2026/07/08 15:21:01 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@ typedef struct s_vector
 	double	z;
 }				t_vector;
 
-t_vector	add_vec(t_vector A, t_vector B);
-t_vector	sous_vec(t_vector A, t_vector B);
-t_vector	mul_vec(t_vector A, double i);
-double		dot_product(t_vector A, t_vector B);
-double		vec_length(t_vector A);
-t_vector	normalization(t_vector A);
-t_vector    cross_vec(t_vector A, t_vector B);
+t_vector	add_vec(t_vector a, t_vector b);
+t_vector	sous_vec(t_vector a, t_vector b);
+t_vector	mul_vec(t_vector a, double i);
+double		dot_product(t_vector a, t_vector b);
+double		vec_length(t_vector a);
+t_vector	normalization(t_vector a);
+t_vector	cross_vec(t_vector a, t_vector b);
 
 #endif

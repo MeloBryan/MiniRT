@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split_spaces.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/13 00:46:40 by marvin            #+#    #+#             */
-/*   Updated: 2026/06/13 00:46:40 by marvin           ###   ########.fr       */
+/*   Created: 2025/11/06 10:43:41 by bmelo             #+#    #+#             */
+/*   Updated: 2025/11/21 11:34:50 by bmelo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ static int	count_words(char const *s)
 	i = 0;
 	while (s[i])
 	{
-		if (s[i] != ' ' && s[i] != '\t' &&
-			(s[i + 1] == ' ' || s[i + 1] == '\t' || s[i + 1] == '\0'))
+		if (s[i] != ' ' && s[i] != '\t'
+			&& (s[i + 1] == ' ' || s[i + 1] == '\t' || s[i + 1] == '\0'))
 			count++;
 		i++;
 	}
@@ -44,7 +44,7 @@ static char	*fill_word(char const *s, int start, int end)
 	return (word);
 }
 
-static char	**free_all(char **tab, int i)
+static void	*free_all(char **tab, int i)
 {
 	while (i >= 0)
 	{
@@ -55,38 +55,45 @@ static char	**free_all(char **tab, int i)
 	return (NULL);
 }
 
-char	**ft_split_spaces(char const *s)
+static int	split_loop(char **tab, char const *s)
 {
-	char	**tab;
-	int		i;
-	int		j;
-	int		start;
+	int	i;
+	int	j;
+	int	start;
 
-	tab = malloc(sizeof(char *) * (count_words(s) + 1));
-	if (!tab || !s)
-		return (NULL);
 	i = 0;
 	j = 0;
 	start = -1;
-	while (s[i])
+	while (1)
 	{
-		if (s[i] != ' ' && s[i] != '\t' && start < 0)
+		if (s[i] && s[i] != ' ' && s[i] != '\t' && start < 0)
 			start = i;
-		else if ((s[i] == ' ' || s[i] == '\t') && start >= 0)
+		else if ((!s[i] || s[i] == ' ' || s[i] == '\t') && start >= 0)
 		{
-			tab[j++] = fill_word(s, start, i);
-			if (!tab[j - 1])
-				return (free_all(tab, j - 2));
+			tab[j] = fill_word(s, start, i);
+			if (!tab[j])
+				return (free_all(tab, j - 1), -1);
+			j++;
 			start = -1;
 		}
-		i++;
+		if (!s[i++])
+			return (j);
 	}
-	if (start >= 0)
-	{
-		tab[j++] = fill_word(s, start, i);
-		if (!tab[j - 1])
-			return (free_all(tab, j - 2));
-	}
-	tab[j] = NULL;
+}
+
+char	**ft_split_spaces(char const *s)
+{
+	char	**tab;
+	int		words;
+
+	if (!s)
+		return (NULL);
+	tab = malloc(sizeof(char *) * (count_words(s) + 1));
+	if (!tab)
+		return (NULL);
+	words = split_loop(tab, s);
+	if (words < 0)
+		return (NULL);
+	tab[words] = NULL;
 	return (tab);
 }

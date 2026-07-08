@@ -3,108 +3,79 @@
 /*                                                        :::      ::::::::   */
 /*   renderer.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/09 16:41:00 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/12 00:52:40 by marvin           ###   ########.fr       */
+/*   Created: 2026/07/08 15:17:46 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/08 15:17:48 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-int hit_sphere_hardcoded(t_ray ray)
+static int	background_color(t_ray ray)
 {
-    // On définit la sphère en dur ici
-    t_vector    sphere_center;
-    double      sphere_radius;
+	int	r;
+	int	g;
+	int	b;
 
-    sphere_center.x = 0.0;
-    sphere_center.y = 0.0;
-    sphere_center.z = 5.0;  // Posée à 5 unités devant la caméra
-    sphere_radius = 1.5;    // Rayon de la sphère
+	r = (int)((ray.direction.x + 1.0) * 127.5);
+	g = (int)((ray.direction.y + 1.0) * 127.5);
+	b = (int)((ray.direction.z + 1.0) * 127.5);
+	return ((r << 16) | (g << 8) | b);
+}
 
-    // Calculs mathématiques (Vecteur Caméra -> Sphère)
-    t_vector    oc;
-    oc.x = ray.origin.x - sphere_center.x;
-    oc.y = ray.origin.y - sphere_center.y;
-    oc.z = ray.origin.z - sphere_center.z;
+int	hit_sphere_hardcoded(t_ray ray)
+{
+	t_vector	center;
+	t_vector	oc;
+	double		a;
+	double		b;
+	double		c;
 
-    double a = (ray.direction.x * ray.direction.x) + 
-               (ray.direction.y * ray.direction.y) + 
-               (ray.direction.z * ray.direction.z);
-    double b = 2.0 * ((oc.x * ray.direction.x) + 
-                      (oc.y * ray.direction.y) + 
-                      (oc.z * ray.direction.z));
-    double c = ((oc.x * oc.x) + (oc.y * oc.y) + (oc.z * oc.z)) - 
-               (sphere_radius * sphere_radius);
+	center.x = 0.0;
+	center.y = 0.0;
+	center.z = 5.0;
+	oc = sous_vec(ray.origin, center);
+	a = dot_product(ray.direction, ray.direction);
+	b = 2.0 * dot_product(oc, ray.direction);
+	c = dot_product(oc, oc) - (1.5 * 1.5);
+	return ((b * b) - (4.0 * a * c) >= 0.0);
+}
 
-    // Le discriminant (Delta)
-    double discriminant = (b * b) - (4.0 * a * c);
+static void	render_pixel(t_data *data, t_basis basis, int x, int y)
+{
+	t_vector	screen;
+	t_ray		ray;
 
-    // Si discriminant >= 0, le rayon traverse la sphère !
-    return (discriminant >= 0.0);
+	screen.x = (2.0 * ((double)x / WIDTH) - 1.0)
+		* ((double)WIDTH / (double)HEIGHT);
+	screen.y = 1.0 - 2.0 * ((double)y / HEIGHT);
+	screen.z = 0.0;
+	ray = ray_init(screen, basis, data);
+	if (hit_sphere_hardcoded(ray))
+		my_mlx_pixel_put(data, x, y, 0xFF0000);
+	else
+		my_mlx_pixel_put(data, x, y, background_color(ray));
 }
 
 void	render_scene(t_data *data)
 {
-	int			x;
-	int			y;
-	double		aspect_ratio;
-	t_vector	f;
-	t_vector	u;
-	t_vector	r;
-	t_vector	screen;
-	t_ray		ray;
+	t_basis	basis;
+	int		x;
+	int		y;
 
-	aspect_ratio = (double)WIDTH / (double)HEIGHT;
-	update_camera_vectors(&f, &r, &u, data);
+	update_camera_vectors(&basis, data);
 	y = 0;
 	while (y < HEIGHT)
 	{
 		x = 0;
 		while (x < WIDTH)
 		{
-			screen.x = (2.0 * ((double)x / WIDTH) - 1.0) * aspect_ratio;
-			screen.y = 1.0 - 2.0 * ((double)y / HEIGHT);
-			ray = ray_init(screen, r, u, f, data);
-			if (hit_sphere_hardcoded(ray))
-				my_mlx_pixel_put(data, x, y, 0xFF0000);
-			else
-			{
-				int re = (int)((ray.direction.x + 1.0) * 127.5);
-				int g = (int)((ray.direction.y + 1.0) * 127.5);
-				int b = (int)((ray.direction.z + 1.0) * 127.5);
-				int color = (re << 16) | (g << 8) | b;
-				my_mlx_pixel_put(data, x, y, color);
-			}
+			render_pixel(data, basis, x, y);
 			x++;
 		}
 		y++;
 	}
-}
-
-t_ray	ray_init(t_vector screen, t_vector r, t_vector u, t_vector f, t_data *data)
-{
-	t_ray	ray;
-
-	ray.origin = data->cam_pos;
-	ray.direction.x = (screen.x * r.x) + (screen.y * u.x) + f.x;
-	ray.direction.y = (screen.x * r.y) + (screen.y * u.y) + f.y;
-	ray.direction.z= (screen.x * r.z) + (screen.y * u.z) + f.z;
-	ray.direction = normalization(ray.direction);
-	return (ray);
-}
-
-void	update_camera_vectors(t_vector *f, t_vector *r, t_vector *u, t_data *data)
-{
-	t_vector	world_up;
-
-	*f = normalization(data->cam_dir);
-	world_up.x = 0.0;
-	world_up.y = 1.0;
-	world_up.z = 0.0;
-	*r = normalization(cross_vec(*f, world_up));
-	*u = cross_vec(*f, *r);
 }
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
