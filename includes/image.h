@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   image.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/13 02:14:17 by marvin           ###   ########.fr       */
+/*   Updated: 2026/07/08 15:21:38 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ typedef struct s_data
 	t_vector	cam_pos;
 	t_vector	cam_dir;
 	double		cam_fov;
-	
 	void		*img;
 	char		*addr;
 	int			bits_per_pixel;
@@ -44,8 +43,8 @@ void	open_win(t_data *data);
 void	handle_input(int key, t_data *data);
 void	render_scene(t_data *data);
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
-t_ray	ray_init(t_vector screen, t_vector r, t_vector u, t_vector f, t_data *data);
-void	update_camera_vectors(t_vector *f, t_vector *r, t_vector *u, t_data *data);
+t_ray	ray_init(t_vector screen, t_basis basis, t_data *data);
+void	update_camera_vectors(t_basis *basis, t_data *data);
 int		hit_sphere_hardcoded(t_ray ray);
 
 #endif

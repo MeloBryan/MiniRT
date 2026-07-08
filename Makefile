@@ -6,19 +6,7 @@
 #    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/08 14:54:44 by edefoy           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/08 00:00:00 by bmelo             ###   ########.fr       #
+#    Updated: 2026/07/08 15:23:34 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -67,7 +55,9 @@ OBJ_DIR     := objs
 SRC         := main.c \
                Image/window_handler.c \
                Image/renderer.c \
+               Rayon/rayon.c \
                Parsing/parse_line.c \
+               Parsing/parse_utils.c \
                Parsing/parse_ambient.c \
                Parsing/parse_camera.c \
                Parsing/parse_light.c \

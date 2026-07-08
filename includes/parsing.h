@@ -16,12 +16,17 @@
 # include "miniRT.h"
 
 int		parse_file(char *file_name, t_data *data);
-int		parse_line(char *line , t_data *data);
+int		parse_line(char *line, t_data *data);
 int		parse_ambient(char *line, t_data *data);
 int		parse_camera(char *line, t_data *data);
 int		parse_light(char *line, t_data *data);
 
+int		rt_error(char *msg);
+int		parse_vec3(char *token, t_vector *vec);
+int		parse_rgb(char *token, int *color);
+int		check_extension(char *file_name);
 int		matrix_length(char **tokens);
+
 void	free_data(t_data *data);
 void	free_matrix(char **matrix);
 
