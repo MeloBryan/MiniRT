@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.c                                          :+:      :+:    :+:   */
+/*   parse_line.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/12 18:27:46 by marvin            #+#    #+#             */
-/*   Updated: 2026/06/12 18:27:46 by marvin           ###   ########.fr       */
+/*   Created: 2026/07/08 13:40:27 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/08 13:40:27 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int parse_file(char *file_name, t_data *data)
 
     fd = open(file_name, O_RDONLY);
     if (fd < 0)
-        return (printf("Error\nCOuld not open file\n"), 0);
+        return (printf("Error\nCould not open file\n"), 0);
     while ((line = get_next_line(fd)) != NULL)
     {
         if (line && line[0] != '\n')
@@ -37,11 +37,11 @@ void    parse_line(char *line , t_data *data)
     if (*line == '\0' || *line == '\n' || *line == '#')
         return ;
     else if (line[0] == 'A' && (line[1] == ' ' || line[1] == '\t'))
-        parse_ambient(line + 1, data);
+        parse_ambient(line, data);
     else if (line[0] == 'C' && (line[1] == ' ' || line[1] == '\t'))
-         parse_camera(line + 1, data);
-    // else if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
-    //     parse_light(line + 1, data);
+         parse_camera(line, data);
+    else if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
+        parse_light(line, data);
     // else if (line[0] == 's' && line[1] == 'p' && (line[2] == ' ' || line[2] == '\t'))
     //     parse_sphere(line + 2, data);
     // else if (line[0] == 'p' && line[1] == 'l' && (line[2] == ' ' || line[2] == '\t'))
