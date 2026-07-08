@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Soustraction.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:09:21 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 16:10:20 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/07/08 14:33:09 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ t_vector	sous_vec(t_vector A, t_vector B)
 {
 	t_vector	res;
 
-	res.x = B.x - A.x;
-	res.y = B.y - A.y;
-	res.z = B.z - A.z;
+	res.x = A.x - B.x;
+	res.y = A.y - B.y;
+	res.z = A.z - B.z;
 	return (res);
 }
