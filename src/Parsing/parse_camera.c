@@ -47,7 +47,8 @@ int parse_camera(char *line, t_data *data)
     if (matrix_length(dir_tokens) != 3)
     {
         printf("Error\nDIRECTION must have 3 values (x,y,z)\n");
-        return (free_matrix(tokens), free_matrix(pos_tokens), 0);
+        return (free_matrix(tokens), free_matrix(pos_tokens),
+			free_matrix(dir_tokens), 0);
     }
     data->cam_dir.x = ft_atof(dir_tokens[0]);
     data->cam_dir.y = ft_atof(dir_tokens[1]);
