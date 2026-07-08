@@ -12,6 +12,19 @@
 
 #include "miniRT.h"
 
+static void	strip_line_end(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line([i]))
+	{
+		if (line[i] == '\n' || line[i] == '\r')
+			line[i] = '\0';
+		i++;
+	}
+}
+
 int parse_file(char *file_name, t_data *data)
 {
     int     fd;
