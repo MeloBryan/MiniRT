@@ -60,6 +60,10 @@ static void	test_parsers(void)
 		&& feq(s.camera.position.x, -50.0) && feq(s.camera.fov, 70.0),
 		"camera: valid line accepted, values stored");
 	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("C 0,0,0 0,0,0.5 70", &s) == 1
+		&& feq(s.camera.direction.z, 1.0),
+		"camera: direction normalized at parse time");
+	ft_bzero(&s, sizeof(t_scene));
 	check(parse_line("C 0,0,0 2,0,0 70", &s) == 0, "camera: dir > 1");
 	ft_bzero(&s, sizeof(t_scene));
 	check(parse_line("C 0,0,0 1,2 70", &s) == 0,
@@ -168,6 +172,32 @@ static void	test_sphere(void)
 	free_objects(&s);
 }
 
+static void	test_plane(void)
+{
+	t_scene	s;
+
+	printf("--- parse_plane ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("pl 0.0,0.0,-10.0 0.0,1.0,0.0 0,0,225", &s) == 1
+		&& s.objects && s.objects->type == PLANE
+		&& feq(s.objects->shape.plane.point.z, -10.0)
+		&& feq(s.objects->shape.plane.normal.y, 1.0)
+		&& ceq(s.objects->color, 0, 0, 225),
+		"valid plane: point, normal and color stored");
+	check(parse_line("pl 0,0,0 0,0.5,0 255,255,255", &s) == 1
+		&& feq(s.objects->next->shape.plane.normal.y, 1.0),
+		"in-range non-unit normal accepted and normalized");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("pl 0,0,0 0,0,0 255,255,255", &s) == 0,
+		"zero normal rejected (defines no plane)");
+	check(parse_line("pl 0,0,0 0,2,0 255,255,255", &s) == 0,
+		"out-of-range normal component rejected");
+	check(parse_line("pl 0,0,0 0,1,0", &s) == 0, "missing color rejected");
+	check(s.objects == NULL, "no object added by rejected lines");
+	free_objects(&s);
+}
+
 static void	test_object_list(void)
 {
 	t_scene		s;
@@ -225,6 +255,7 @@ int	main(void)
 	test_dispatcher();
 	test_files();
 	test_sphere();
+	test_plane();
 	test_object_list();
 	test_vectors();
 	printf("========================================\n");
