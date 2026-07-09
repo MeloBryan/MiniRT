@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 14:36:48 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:38:32 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:41:44 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	parse_cylinder(char *line, t_scene *scene)
 {
 	char		**tokens;
 	t_object	obj;
- 
+
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 6)
 		return (free_matrix(tokens), rt_error("Invalid cylinder format"));

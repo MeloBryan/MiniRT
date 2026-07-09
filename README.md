@@ -1,6 +1,6 @@
 # miniRT — Project State & Roadmap (proto-README)
 
-> Working document, milestone 1 (foundation complete).
+> Working document, milestone 2 (foundation + scene model complete).
 > Will be trimmed into the final `README.md` required by the subject
 > (first line with logins, Description / Instructions / Resources sections).
 
@@ -42,15 +42,27 @@ single division for planes.
 
 ## 2. What the program can do today
 
-**Scene parsing (complete for A, C, L):**
+**Scene parsing (complete: A, C, L, sp, pl, cy):**
 - Takes a `*.rt` scene file as its only argument; rejects any other
   usage, a missing file, or a wrong extension, with `Error\n` + message
   and exit code 1 (subject-compliant).
-- Parses the three unique elements:
+- Parses every mandatory element. The unique ones (capital letters):
   - `A` ambient light — ratio in [0.0, 1.0], RGB in [0, 255]
   - `C` camera — position, direction in [-1, 1] (non-zero), FOV in [0, 180]
   - `L` light — position, brightness ratio in [0.0, 1.0], RGB (unused in
     mandatory part but parsed and validated)
+
+  And the repeatable objects (lowercase), stored as a linked list of
+  tagged unions in t_scene, in file order:
+  - `sp` sphere — center, diameter (> 0, stored as radius), color
+  - `pl` plane — point, normal (validated, normalized on input), color
+  - `cy` cylinder — center (axis midpoint), axis (normalized), diameter
+    and height (> 0), color
+  Directions share one helper (parse_direction): components in [-1,1],
+  non-zero, normalized at parse time. Colors are stored normalized to
+  [0.0, 1.0] as t_color (= t_vector); packed to 0xRRGGBB only at MLX
+  write time. The subject's chapter IV example scene is a test fixture
+  asserted value-for-value.
 - Tolerates: blank lines, whitespace-only lines, leading spaces/tabs,
   multiple spaces between fields, `#` comment lines, Windows CRLF line
   endings, missing final newline.
@@ -84,9 +96,9 @@ single division for planes.
 
 ## 3. What it cannot do yet (honest list)
 
-- **No objects from the scene file.** `sp`, `pl`, `cy` lines are not
-  parsed (currently they would hit "Unknown element identifier"). The
-  only sphere is hardcoded in the renderer.
+- **Objects are parsed but not rendered.** The scene list is filled and
+  freed correctly, but the renderer still tests its one hardcoded
+  sphere; module 2 (intersections) connects the two.
 - **FOV is parsed but ignored.** The virtual screen sits at a fixed
   distance, giving an implicit ~90° field of view whatever the file says.
 - **Hit test is boolean.** The intersection returns hit/no-hit, not the
@@ -175,7 +187,7 @@ copy-paste speed). Ranges: low = things go smoothly, high = debugging.
 
 | # | Module | Content | Estimate |
 |---|--------|---------|----------|
-| 1 | **Objects: parsing & storage** | Design call (list vs arrays, t_scene, color type); parse `sp`/`pl`/`cy` with the existing helpers; store multiple objects; extend tests + scene fixtures | **4–6 h** |
+| 1 | ~~**Objects: parsing & storage**~~ | DONE — t_scene, tagged-union list, sp/pl/cy parsers, parse_direction, 62-check bench incl. subject example | ~~4–6 h~~ |
 | 2 | **Intersections** | Sphere returning distance t (two roots, nearest positive); plane (division + parallel case); cylinder: infinite body + height clamp + the two caps (the hardest math of the project); closest-hit loop over all objects | **8–12 h** |
 | 3 | **Real camera** | Use the parsed FOV (screen distance = f(tan(fov/2))); fix the straight-up/down camera degeneracy; render each object with its own color | **3–4 h** |
 | 4 | **Lighting** | Hit point + surface normal per object type (inside/outside!); ambient term; diffuse term (dot(normal, light_dir)); hard shadows via shadow ray + epsilon against acne | **6–8 h** |

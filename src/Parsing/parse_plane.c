@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 14:25:26 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:27:44 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:41:37 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	parse_plane(char *line, t_scene *scene)
 {
 	char		**tokens;
 	t_object	obj;
- 
+
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 4)
 		return (free_matrix(tokens), rt_error("Invalid plane format"));

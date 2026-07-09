@@ -1,0 +1,15 @@
+# every element type, hostile spacing, comments between elements
+A 0.15 200,200,255
+C 0,5,-10   0,-0.2,1   90
+L 5,10,-5 0.8 255,255,255
+
+# floor and back wall
+pl 0,-2,0 0,1,0 180,180,180
+pl 0,0,50 0,0,-1 100,100,255
+
+# three spheres of decreasing size
+sp -4,0,10 6 255,0,0
+sp 0,0,8   3 0,255,0
+sp 3,0,6   1.5 0,0,255
+
+cy 6,-2,12 0,1,0 3 8 255,255,0

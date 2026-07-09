@@ -48,11 +48,11 @@ int	parse_line(char *line, t_scene *scene)
 		return (parse_cylinder(line, scene));
 	return (rt_error("Unknown element identifier"));
 }
- 
+
 int	check_extension(char *file_name)
 {
 	int	len;
- 
+
 	len = ft_strlen(file_name);
 	if (len < 4)
 		return (0);
