@@ -5,15 +5,16 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/08 14:13:42 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/08 14:13:42 by edefoy           ###   ########.fr       */
+/*   Created: 2026/07/09 14:59:57 by edefoy            #+#    #+#             */
+/*   Updated: 2026/07/09 14:59:57 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSING_H
 # define PARSING_H
 
-# include "miniRT.h"
+# include "structures.h"
+# include "image.h"
 
 int			parse_file(char *file_name, t_scene *scene);
 int			parse_line(char *line, t_scene *scene);

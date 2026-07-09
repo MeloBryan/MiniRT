@@ -6,14 +6,14 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/09 12:55:34 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:59:32 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IMAGE_H
 # define IMAGE_H
 
-# include "miniRT.h"
+# include "structures.h"
 
 /*
 ** t_data now holds ONLY the MLX plumbing, plus the scene it displays.
