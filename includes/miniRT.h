@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:32 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/13 01:06:09 by marvin           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:16:19 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdbool.h>
+# include "image.h"
 # include "keys.h"
+# include "parsing.h"
 # include "structures.h"
 # include "vector.h"
-# include "image.h"
-# include "parsing.h"
-# include "../minilibx_linux/mlx.h"
-# include "../libft/includes/libft.h"
+# include "libft.h"
+# include "mlx.h"
 
 # define WIDTH 800
 # define HEIGHT 800

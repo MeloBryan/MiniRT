@@ -37,6 +37,9 @@ int	parse_line(char *line, t_scene *scene)
 		return (parse_camera(line, scene));
 	if (line[0] == 'L' && (line[1] == ' ' || line[1] == '\t'))
 		return (parse_light(line, scene));
+	if (line[0] == 's' && line[1] == 'p'
+		&& (line[2] == ' ' || line[2] == '\t'))
+		return (parse_sphere(line, scene));
 	return (rt_error("Unknown element identifier"));
 }
 

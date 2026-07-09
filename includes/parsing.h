@@ -20,6 +20,7 @@ int			parse_line(char *line, t_scene *scene);
 int			parse_ambient(char *line, t_scene *scene);
 int			parse_camera(char *line, t_scene *scene);
 int			parse_light(char *line, t_scene *scene);
+int			parse_sphere(char *line, t_scene *scene);
 
 int			rt_error(char *msg);
 int			parse_vec3(char *token, t_vector *vec);
