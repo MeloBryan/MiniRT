@@ -128,6 +128,44 @@ static void	test_files(void)
 		"unknown identifier in file rejected");
 	ft_bzero(&s, sizeof(t_scene));
 	check(parse_file("scenes/nope.rt", &s) == 0, "missing file rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/two_spheres.rt", &s) == 1
+		&& s.objects && s.objects->next && !s.objects->next->next
+		&& feq(s.objects->shape.sphere.radius, 6.3)
+		&& feq(s.objects->next->shape.sphere.radius, 2.0),
+		"scene with two spheres: both in list, file order");
+	free_objects(&s);
+}
+
+static void	test_sphere(void)
+{
+	t_scene	s;
+
+	printf("--- parse_sphere ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("sp 0.0,0.0,20.6 12.6 10,0,255", &s) == 1
+		&& s.objects && s.objects->type == SPHERE
+		&& feq(s.objects->shape.sphere.center.z, 20.6)
+		&& feq(s.objects->shape.sphere.radius, 6.3)
+		&& ceq(s.objects->color, 10, 0, 255),
+		"valid sphere: stored, radius = diameter / 2");
+	check(parse_line("sp 1,1,1 4 0,255,0", &s) == 1
+		&& s.objects->next && s.objects->next->type == SPHERE,
+		"second sphere allowed (sp is not unique)");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("sp 0,0,5 0 255,0,0", &s) == 0,
+		"zero diameter rejected");
+	check(parse_line("sp 0,0,5 -3 255,0,0", &s) == 0,
+		"negative diameter rejected");
+	check(parse_line("sp 0,0,5 12.6", &s) == 0,
+		"missing color rejected");
+	check(parse_line("sp 0,0 12.6 255,0,0", &s) == 0,
+		"2-value center rejected");
+	check(parse_line("sp 0,0,5 12.6 300,0,0", &s) == 0,
+		"RGB out of range rejected");
+	check(s.objects == NULL, "no object added by rejected lines");
+	free_objects(&s);
 }
 
 static void	test_object_list(void)
@@ -186,6 +224,7 @@ int	main(void)
 	test_duplicates();
 	test_dispatcher();
 	test_files();
+	test_sphere();
 	test_object_list();
 	test_vectors();
 	printf("========================================\n");
