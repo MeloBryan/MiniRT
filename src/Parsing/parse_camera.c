@@ -22,28 +22,28 @@ static int	valid_direction(t_vector dir)
 	return (1);
 }
 
-int	parse_camera(char *line, t_data *data)
+int	parse_camera(char *line, t_scene *scene)
 {
 	char	**tokens;
 
-	if (data->camera_already_set == 1)
+	if (scene->camera_set == 1)
 		return (rt_error("Multiple camera detected"));
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 4)
 		return (free_matrix(tokens), rt_error("Invalid camera format"));
-	if (!parse_vec3(tokens[1], &data->cam_pos))
+	if (!parse_vec3(tokens[1], &scene->camera.position))
 		return (free_matrix(tokens),
 			rt_error("POSITION must have 3 values (x,y,z)"));
-	if (!parse_vec3(tokens[2], &data->cam_dir))
+	if (!parse_vec3(tokens[2], &scene->camera.direction))
 		return (free_matrix(tokens),
 			rt_error("DIRECTION must have 3 values (x,y,z)"));
-	if (!valid_direction(data->cam_dir))
+	if (!valid_direction(scene->camera.direction))
 		return (free_matrix(tokens),
 			rt_error("Invalid direction value(must be between -1 and 1)"));
-	data->cam_fov = ft_atof(tokens[3]);
-	if (data->cam_fov < 0 || data->cam_fov > 180)
+	scene->camera.fov = ft_atof(tokens[3]);
+	if (scene->camera.fov < 0 || scene->camera.fov > 180)
 		return (free_matrix(tokens),
 			rt_error("FOV value must be between 0 and 180"));
-	data->camera_already_set = 1;
+	scene->camera_set = 1;
 	return (free_matrix(tokens), 1);
 }

@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 15:12:25 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/08 15:12:40 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 13:07:04 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	parse_vec3(char *token, t_vector *vec)
 	return (1);
 }
 
-int	parse_rgb(char *token, int *color)
+int	parse_color(char *token, t_color *color)
 {
 	char	**parts;
 	int		rgb[3];
@@ -59,7 +59,9 @@ int	parse_rgb(char *token, int *color)
 	if (rgb[0] < 0 || rgb[0] > 255 || rgb[1] < 0 || rgb[1] > 255
 		|| rgb[2] < 0 || rgb[2] > 255)
 		return (0);
-	*color = (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
+	color->x = rgb[0] / 255.0;
+	color->y = rgb[1] / 255.0;
+	color->z = rgb[2] / 255.0;
 	return (1);
 }
 

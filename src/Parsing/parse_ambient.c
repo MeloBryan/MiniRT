@@ -12,22 +12,22 @@
 
 #include "miniRT.h"
 
-int	parse_ambient(char *line, t_data *data)
+int	parse_ambient(char *line, t_scene *scene)
 {
 	char	**tokens;
 
-	if (data->ambient_already_set == 1)
+	if (scene->ambient_set == 1)
 		return (rt_error("Multiple Ambient lights detected"));
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 3)
 		return (free_matrix(tokens), rt_error("Invalid Ambient light format"));
-	data->ambient_ratio = ft_atof(tokens[1]);
-	if (data->ambient_ratio < 0.0 || data->ambient_ratio > 1.0)
+	scene->ambient.ratio = ft_atof(tokens[1]);
+	if (scene->ambient.ratio < 0.0 || scene->ambient.ratio > 1.0)
 		return (free_matrix(tokens),
 			rt_error("Ambient ratio must be between 0.0 and 1.0"));
-	if (!parse_rgb(tokens[2], &data->ambient_color))
+	if (!parse_color(tokens[2], &scene->ambient.color))
 		return (free_matrix(tokens),
 			rt_error("RGB color values must be between 0 and 255"));
-	data->ambient_already_set = 1;
+	scene->ambient_set = 1;
 	return (free_matrix(tokens), 1);
 }
