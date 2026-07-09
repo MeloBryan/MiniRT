@@ -198,6 +198,37 @@ static void	test_plane(void)
 	free_objects(&s);
 }
 
+static void	test_cylinder(void)
+{
+	t_scene	s;
+
+	printf("--- parse_cylinder ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("cy 50.0,0.0,20.6 0.0,0.0,1.0 14.2 21.42 10,0,255", &s)
+		== 1 && s.objects && s.objects->type == CYLINDER
+		&& feq(s.objects->shape.cylinder.center.x, 50.0)
+		&& feq(s.objects->shape.cylinder.axis.z, 1.0)
+		&& feq(s.objects->shape.cylinder.radius, 7.1)
+		&& feq(s.objects->shape.cylinder.height, 21.42)
+		&& ceq(s.objects->color, 10, 0, 255),
+		"valid cylinder: all six fields stored, radius = diam / 2");
+	check(parse_line("cy 0,0,0 0,0.5,0 2 4 255,0,0", &s) == 1
+		&& feq(s.objects->next->shape.cylinder.axis.y, 1.0),
+		"non-unit axis accepted and normalized");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("cy 0,0,0 0,1,0 0 4 255,0,0", &s) == 0,
+		"zero diameter rejected");
+	check(parse_line("cy 0,0,0 0,1,0 2 -4 255,0,0", &s) == 0,
+		"negative height rejected");
+	check(parse_line("cy 0,0,0 0,0,0 2 4 255,0,0", &s) == 0,
+		"zero axis rejected");
+	check(parse_line("cy 0,0,0 0,1,0 2 255,0,0", &s) == 0,
+		"missing height (5 tokens) rejected");
+	check(s.objects == NULL, "no object added by rejected lines");
+	free_objects(&s);
+}
+
 static void	test_object_list(void)
 {
 	t_scene		s;
@@ -256,6 +287,7 @@ int	main(void)
 	test_files();
 	test_sphere();
 	test_plane();
+	test_cylinder();
 	test_object_list();
 	test_vectors();
 	printf("========================================\n");

@@ -43,6 +43,9 @@ int	parse_line(char *line, t_scene *scene)
 	if (line[0] == 'p' && line[1] == 'l'
 		&& (line[2] == ' ' || line[2] == '\t'))
 		return (parse_plane(line, scene));
+	if (line[0] == 'c' && line[1] == 'y'
+		&& (line[2] == ' ' || line[2] == '\t'))
+		return (parse_cylinder(line, scene));
 	return (rt_error("Unknown element identifier"));
 }
  
