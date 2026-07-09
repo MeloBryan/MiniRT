@@ -130,6 +130,37 @@ static void	test_files(void)
 	check(parse_file("scenes/nope.rt", &s) == 0, "missing file rejected");
 }
 
+static void	test_object_list(void)
+{
+	t_scene		s;
+	t_object	blue;
+	t_object	*node;
+
+	printf("--- object list ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	ft_bzero(&blue, sizeof(t_object));
+	blue.type = SPHERE;
+	blue.color = (t_color){1.0, 0.0, 0.0};
+	blue.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.5};
+	node = add_object(&s, blue);
+	check(node != NULL && s.objects == node,
+		"first object becomes list head");
+	blue.type = PLANE;
+	blue.shape.plane = (t_plane){(t_vector){0, -1, 0}, (t_vector){0, 1, 0}};
+	node = add_object(&s, blue);
+	check(s.objects->next == node && node->next == NULL,
+		"second object appended at tail");
+	check(s.objects->type == SPHERE && s.objects->next->type == PLANE,
+		"tags preserved in file order");
+	check(feq(s.objects->shape.sphere.radius, 1.5)
+		&& feq(s.objects->next->shape.plane.normal.y, 1.0),
+		"union payloads read back through the right tag");
+	free_objects(&s);
+	check(s.objects == NULL, "free_objects resets the head");
+	free_objects(&s);
+	check(1, "double free_objects is harmless");
+}
+
 static void	test_vectors(void)
 {
 	t_vector	a;
@@ -155,6 +186,7 @@ int	main(void)
 	test_duplicates();
 	test_dispatcher();
 	test_files();
+	test_object_list();
 	test_vectors();
 	printf("========================================\n");
 	if (g_fail == 0)
