@@ -1,6 +1,7 @@
 # Binaries
 MiniRT
 miniRT
+test_parsing
 
 # Object files and dependency files
 objs/
