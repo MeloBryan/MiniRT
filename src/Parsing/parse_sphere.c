@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:59:22 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:18:59 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:41:00 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	parse_sphere(char *line, t_scene *scene)
 {
 	char		**tokens;
 	t_object	obj;
- 
+
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 4)
 		return (free_matrix(tokens), rt_error("Invalid sphere format"));

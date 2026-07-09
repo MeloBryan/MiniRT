@@ -229,6 +229,55 @@ static void	test_cylinder(void)
 	free_objects(&s);
 }
 
+static void	check_subject_objects(t_object *o)
+{
+	check(o && o->type == PLANE
+		&& feq(o->shape.plane.point.x, 0.0)
+		&& feq(o->shape.plane.normal.y, 1.0)
+		&& ceq(o->color, 255, 0, 225), "  object 1 is the plane");
+	o = o->next;
+	check(o && o->type == SPHERE
+		&& feq(o->shape.sphere.center.z, 20.0)
+		&& feq(o->shape.sphere.radius, 10.0)
+		&& ceq(o->color, 255, 0, 0), "  object 2 is the sphere");
+	o = o->next;
+	check(o && o->type == CYLINDER
+		&& feq(o->shape.cylinder.center.x, 50.0)
+		&& feq(o->shape.cylinder.axis.z, 1.0)
+		&& feq(o->shape.cylinder.radius, 7.1)
+		&& feq(o->shape.cylinder.height, 21.42)
+		&& ceq(o->color, 10, 0, 255) && o->next == NULL,
+		"  object 3 is the cylinder, end of list");
+}
+
+static void	test_end_to_end(void)
+{
+	t_scene	s;
+
+	printf("--- end to end: subject example scene ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/subject_example.rt", &s) == 1,
+		"subject chapter IV scene parses");
+	check(feq(s.ambient.ratio, 0.2) && ceq(s.ambient.color, 255, 255, 255),
+		"  ambient matches the PDF");
+	check(feq(s.camera.position.x, -50.0) && feq(s.camera.direction.z, 1.0)
+		&& feq(s.camera.fov, 70.0), "  camera matches the PDF");
+	check(feq(s.light.position.y, 0.0) && feq(s.light.position.z, 30.0)
+		&& feq(s.light.ratio, 0.7), "  light matches the PDF");
+	check_subject_objects(s.objects);
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/mixed_objects.rt", &s) == 1,
+		"mixed scene: 6 objects, comments, tabs");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/object_error.rt", &s) == 0
+		&& s.objects != NULL,
+		"error after 2 valid objects: rejected, partial list to free");
+	free_objects(&s);
+	check(s.objects == NULL, "partial list freed (leak covered by ASan)");
+}
+
 static void	test_object_list(void)
 {
 	t_scene		s;
@@ -288,6 +337,7 @@ int	main(void)
 	test_sphere();
 	test_plane();
 	test_cylinder();
+	test_end_to_end();
 	test_object_list();
 	test_vectors();
 	printf("========================================\n");
