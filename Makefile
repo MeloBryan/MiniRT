@@ -6,7 +6,7 @@
 #    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/08 15:23:34 by edefoy           ###   ########.fr        #
+#    Updated: 2026/07/09 13:13:56 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,6 +55,7 @@ OBJ_DIR     := objs
 SRC         := main.c \
                Image/window_handler.c \
                Image/renderer.c \
+               Image/color.c \
                Rayon/rayon.c \
                Parsing/parse_line.c \
                Parsing/parse_utils.c \

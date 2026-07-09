@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:21:01 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/08 15:10:58 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 13:12:25 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	main(int argc, char **argv)
 	if (argc != 2)
 		return (rt_error("Usage: ./MiniRT <scene.rt>"), 1);
 	ft_bzero(&data, sizeof(t_data));
-	if (!parse_file(argv[1], &data))
+	if (!parse_file(argv[1], &data.scene))
 		return (1);
 	open_win(&data);
 	free_data(&data);

@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:16:11 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/08 15:18:33 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 13:10:59 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_ray	ray_init(t_vector screen, t_basis basis, t_data *data)
 {
 	t_ray	ray;
 
-	ray.origin = data->cam_pos;
+	ray.origin = data->scene.camera.position;
 	ray.direction.x = (screen.x * basis.r.x) + (screen.y * basis.u.x)
 		+ basis.f.x;
 	ray.direction.y = (screen.x * basis.r.y) + (screen.y * basis.u.y)
@@ -31,7 +31,7 @@ void	update_camera_vectors(t_basis *basis, t_data *data)
 {
 	t_vector	world_up;
 
-	basis->f = normalization(data->cam_dir);
+	basis->f = normalization(data->scene.camera.direction);
 	world_up.x = 0.0;
 	world_up.y = 1.0;
 	world_up.z = 0.0;

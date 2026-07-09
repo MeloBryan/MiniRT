@@ -20,6 +20,17 @@
 
 static int	g_fail = 0;
 
+static int	feq(double a, double b)
+{
+	return (fabs(a - b) < 1e-9);
+}
+
+static int	ceq(t_color c, int r, int g, int b)
+{
+	return (feq(c.x, r / 255.0) && feq(c.y, g / 255.0)
+		&& feq(c.z, b / 255.0));
+}
+
 static void	check(int cond, char *name)
 {
 	if (cond)
@@ -33,90 +44,90 @@ static void	check(int cond, char *name)
 
 static void	test_parsers(void)
 {
-	t_data	d;
+	t_scene	s;
 
 	printf("--- element parsers ---\n");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("A 0.2 255,128,0", &d) == 1
-		&& d.ambient_ratio == 0.2 && d.ambient_color == 0xFF8000,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("A 0.2 255,128,0", &s) == 1
+		&& feq(s.ambient.ratio, 0.2) && ceq(s.ambient.color, 255, 128, 0),
 		"ambient: valid line accepted, values stored");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("A 1.5 255,255,255", &d) == 0, "ambient: bad ratio");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("A 0.2 300,0,0", &d) == 0, "ambient: bad RGB");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("C -50.0,0,20 0,0,1 70", &d) == 1
-		&& d.cam_pos.x == -50.0 && d.cam_fov == 70.0,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("A 1.5 255,255,255", &s) == 0, "ambient: bad ratio");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("A 0.2 300,0,0", &s) == 0, "ambient: bad RGB");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("C -50.0,0,20 0,0,1 70", &s) == 1
+		&& feq(s.camera.position.x, -50.0) && feq(s.camera.fov, 70.0),
 		"camera: valid line accepted, values stored");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("C 0,0,0 2,0,0 70", &d) == 0, "camera: dir > 1");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("C 0,0,0 1,2 70", &d) == 0,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("C 0,0,0 2,0,0 70", &s) == 0, "camera: dir > 1");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("C 0,0,0 1,2 70", &s) == 0,
 		"camera: dir with 2 values (step 4 leak path)");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("C 0,0,0 0,0,1 999", &d) == 0, "camera: bad FOV");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("L -40.0,50.0,0.0 0.6 10,20,30", &d) == 1
-		&& d.light_pos.y == 50.0 && d.light_color == 0x0A141E,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("C 0,0,0 0,0,1 999", &s) == 0, "camera: bad FOV");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("L -40.0,50.0,0.0 0.6 10,20,30", &s) == 1
+		&& feq(s.light.position.y, 50.0) && ceq(s.light.color, 10, 20, 30),
 		"light: valid line accepted, values stored");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("L 0,0,0 0.5", &d) == 0, "light: truncated");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("L 0,0,0 0.5", &s) == 0, "light: truncated");
 }
 
 static void	test_duplicates(void)
 {
-	t_data	d;
+	t_scene	s;
 
 	printf("--- duplicate elements ---\n");
-	ft_bzero(&d, sizeof(t_data));
-	parse_line("A 0.2 255,255,255", &d);
-	check(parse_line("A 0.3 0,0,0", &d) == 0, "second A rejected");
-	ft_bzero(&d, sizeof(t_data));
-	parse_line("C 0,0,0 0,0,1 70", &d);
-	check(parse_line("C 1,1,1 0,1,0 90", &d) == 0, "second C rejected");
-	ft_bzero(&d, sizeof(t_data));
-	parse_line("L 0,0,0 0.5 255,255,255", &d);
-	check(parse_line("L 1,1,1 0.2 0,0,0", &d) == 0, "second L rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	parse_line("A 0.2 255,255,255", &s);
+	check(parse_line("A 0.3 0,0,0", &s) == 0, "second A rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	parse_line("C 0,0,0 0,0,1 70", &s);
+	check(parse_line("C 1,1,1 0,1,0 90", &s) == 0, "second C rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	parse_line("L 0,0,0 0.5 255,255,255", &s);
+	check(parse_line("L 1,1,1 0.2 0,0,0", &s) == 0, "second L rejected");
 }
 
 static void	test_dispatcher(void)
 {
-	t_data	d;
+	t_scene	s;
 
 	printf("--- dispatcher ---\n");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("   A 0.2 255,255,255", &d) == 1,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("   A 0.2 255,255,255", &s) == 1,
 		"leading spaces skipped");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("# comment", &d) == 1, "comment ignored");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("", &d) == 1, "empty line ignored");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_line("X 1,2,3", &d) == 0, "unknown identifier rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("# comment", &s) == 1, "comment ignored");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("", &s) == 1, "empty line ignored");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("X 1,2,3", &s) == 0, "unknown identifier rejected");
 }
 
 static void	test_files(void)
 {
-	t_data	d;
+	t_scene	s;
 
 	printf("--- parse_file ---\n");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_file("scenes/test.rt", &d) == 1
-		&& d.ambient_already_set && d.camera_already_set
-		&& d.light_already_set,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/test.rt", &s) == 1
+		&& s.ambient_set && s.camera_set
+		&& s.light_set,
 		"valid scene: returns 1, all elements set");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_file("scenes/test_crlf_noeol.rt", &d) == 1,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/test_crlf_noeol.rt", &s) == 1,
 		"CRLF scene without final newline parsed");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_file("scenes/err_then_valid.rt", &d) == 0
-		&& d.camera_already_set == 0,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/err_then_valid.rt", &s) == 0
+		&& s.camera_set == 0,
 		"broken scene: returns 0, parsing stopped at first error");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_file("scenes/unknown_id.rt", &d) == 0,
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/unknown_id.rt", &s) == 0,
 		"unknown identifier in file rejected");
-	ft_bzero(&d, sizeof(t_data));
-	check(parse_file("scenes/nope.rt", &d) == 0, "missing file rejected");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/nope.rt", &s) == 0, "missing file rejected");
 }
 
 static void	test_vectors(void)
