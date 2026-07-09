@@ -40,7 +40,20 @@ int	parse_line(char *line, t_scene *scene)
 	if (line[0] == 's' && line[1] == 'p'
 		&& (line[2] == ' ' || line[2] == '\t'))
 		return (parse_sphere(line, scene));
+	if (line[0] == 'p' && line[1] == 'l'
+		&& (line[2] == ' ' || line[2] == '\t'))
+		return (parse_plane(line, scene));
 	return (rt_error("Unknown element identifier"));
+}
+ 
+int	check_extension(char *file_name)
+{
+	int	len;
+ 
+	len = ft_strlen(file_name);
+	if (len < 4)
+		return (0);
+	return (ft_strncmp(file_name + len - 3, ".rt", 3) == 0);
 }
 
 int	parse_file(char *file_name, t_scene *scene)

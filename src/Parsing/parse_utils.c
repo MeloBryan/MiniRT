@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 15:12:25 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 13:07:04 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/09 14:28:34 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,15 @@ int	parse_color(char *token, t_color *color)
 	return (1);
 }
 
-int	check_extension(char *file_name)
+int	parse_direction(char *token, t_vector *vec)
 {
-	int	len;
-
-	len = ft_strlen(file_name);
-	if (len < 4)
+	if (!parse_vec3(token, vec))
 		return (0);
-	return (ft_strncmp(file_name + len - 3, ".rt", 3) == 0);
+	if (vec->x < -1.0 || vec->x > 1.0 || vec->y < -1.0 || vec->y > 1.0
+		|| vec->z < -1.0 || vec->z > 1.0)
+		return (0);
+	if (vec->x == 0.0 && vec->y == 0.0 && vec->z == 0.0)
+		return (0);
+	*vec = normalization(*vec);
+	return (1);
 }

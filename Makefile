@@ -6,7 +6,7 @@
 #    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/09 14:00:08 by edefoy           ###   ########.fr        #
+#    Updated: 2026/07/09 14:32:24 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -63,6 +63,7 @@ SRC         := main.c \
                Parsing/parse_camera.c \
                Parsing/parse_light.c \
 			   Parsing/parse_sphere.c \
+			   Parsing/parse_plane.c \
                Parsing/free.c \
 			   Parsing/object.c \
                Vectors/Addition.c \

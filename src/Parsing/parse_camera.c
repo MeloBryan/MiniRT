@@ -12,16 +12,6 @@
 
 #include "miniRT.h"
 
-static int	valid_direction(t_vector dir)
-{
-	if (dir.x < -1.0 || dir.x > 1.0 || dir.y < -1.0 || dir.y > 1.0
-		|| dir.z < -1.0 || dir.z > 1.0)
-		return (0);
-	if (dir.x == 0.0 && dir.y == 0.0 && dir.z == 0.0)
-		return (0);
-	return (1);
-}
-
 int	parse_camera(char *line, t_scene *scene)
 {
 	char	**tokens;
@@ -34,12 +24,9 @@ int	parse_camera(char *line, t_scene *scene)
 	if (!parse_vec3(tokens[1], &scene->camera.position))
 		return (free_matrix(tokens),
 			rt_error("POSITION must have 3 values (x,y,z)"));
-	if (!parse_vec3(tokens[2], &scene->camera.direction))
+	if (!parse_direction(tokens[2], &scene->camera.direction))
 		return (free_matrix(tokens),
-			rt_error("DIRECTION must have 3 values (x,y,z)"));
-	if (!valid_direction(scene->camera.direction))
-		return (free_matrix(tokens),
-			rt_error("Invalid direction value(must be between -1 and 1)"));
+			rt_error("DIRECTION must be 3 values in [-1,1], not all zero"));
 	scene->camera.fov = ft_atof(tokens[3]);
 	if (scene->camera.fov < 0 || scene->camera.fov > 180)
 		return (free_matrix(tokens),
