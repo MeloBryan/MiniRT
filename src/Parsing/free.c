@@ -16,6 +16,7 @@ void	free_data(t_data *data)
 {
 	if (!data)
 		return ;
+	free_objects(&data->scene);
 	if (data->img)
 		mlx_destroy_image(data->mlx, data->img);
 	if (data->win)
