@@ -133,6 +133,16 @@ static void	test_files(void)
 	ft_bzero(&s, sizeof(t_scene));
 	check(parse_file("scenes/nope.rt", &s) == 0, "missing file rejected");
 	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/cylinder_endon.rt", &s) == 1
+		&& parse_file("scenes/cylinder_tilted.rt", &s) == 0,
+		"edge-case fixtures parse (2nd call: duplicate A rejected)");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/inside_sphere.rt", &s) == 1
+		&& s.objects->shape.sphere.radius == 10.0,
+		"inside-sphere fixture: camera sits within radius 10");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
 	check(parse_file("scenes/two_spheres.rt", &s) == 1
 		&& s.objects && s.objects->next && !s.objects->next->next
 		&& feq(s.objects->shape.sphere.radius, 6.3)
@@ -309,6 +319,239 @@ static void	test_object_list(void)
 	check(1, "double free_objects is harmless");
 }
 
+static t_ray	make_ray(double ox, double oy, double oz, t_vector dir)
+{
+	t_ray	ray;
+
+	ray.origin = (t_vector){ox, oy, oz};
+	ray.direction = dir;
+	return (ray);
+}
+
+static void	test_intersect_sphere(void)
+{
+	t_object	sp;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_sphere ---\n");
+	ft_bzero(&sp, sizeof(t_object));
+	sp.type = SPHERE;
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.point.z, 4.0) && feq(hit.normal.z, -1.0)
+		&& hit.object == &sp,
+		"frontal hit: t = 4, point (0,0,4), normal (0,0,-1)");
+	ray = make_ray(0, 5, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 0, "clear miss");
+	ray = make_ray(0, 1, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 5.0)
+		&& feq(hit.normal.y, 1.0),
+		"tangent ray: disc = 0, one grazing hit at t = 5");
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, -1});
+	check(intersect_sphere(ray, &sp, &hit) == 0,
+		"sphere behind the ray: both roots negative, miss");
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 0}, 2.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.z, 1.0),
+		"camera inside: near root rejected, exit hit at t = 2");
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 2});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.z, 4.0),
+		"non-unit direction: t halves, same world point");
+}
+
+static void	test_intersect_plane(void)
+{
+	t_object	pl;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_plane ---\n");
+	ft_bzero(&pl, sizeof(t_object));
+	pl.type = PLANE;
+	pl.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	ray = make_ray(0, 0, 0, (t_vector){0, -1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.y, -2.0) && feq(hit.normal.y, 1.0),
+		"floor below: t = 2, point (0,-2,0), normal up");
+	ray = make_ray(0, 0, 0, (t_vector){1, 0, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"parallel ray (D.N = 0): miss, no division blowup");
+	ray = make_ray(0, -2, 0, (t_vector){1, 0, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"ray lying inside the plane: edge-on, miss");
+	ray = make_ray(0, 0, 0, (t_vector){0, 1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"plane behind the ray: t < 0, miss");
+	pl.shape.plane.normal = (t_vector){0, -1, 0};
+	ray = make_ray(0, 0, 0, (t_vector){0, -1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.y, 1.0),
+		"stored normal faces away: flipped toward the viewer");
+	ray = make_ray(3, -5, 7, (t_vector){0, 1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 3.0)
+		&& feq(hit.point.x, 3.0) && feq(hit.normal.y, -1.0),
+		"seen from below: t = 3, normal flipped down");
+}
+
+static void	test_intersect_cylinder(void)
+{
+	t_object	cy;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_cylinder (body) ---\n");
+	ft_bzero(&cy, sizeof(t_object));
+	cy.type = CYLINDER;
+	cy.shape.cylinder = (t_cylinder){(t_vector){0, 0, 5},
+		(t_vector){0, 1, 0}, 1.0, 4.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.point.z, 4.0) && feq(hit.normal.z, -1.0),
+		"frontal hit: t = 4, radial normal (0,0,-1)");
+	ray = make_ray(0, 1.9, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 4.0),
+		"just inside the height (m = 1.9 < h/2): hit");
+	ray = make_ray(0, 2.1, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"just above the height (m = 2.1 > h/2): miss");
+	ray = make_ray(0.5, -10, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 8.0)
+		&& feq(hit.normal.y, -1.0),
+		"parallel to axis, inside radius: bottom cap at t = 8 (was miss)");
+	ray = make_ray(0, 4, 5, (t_vector){0, -1, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"passes over the rim: outside both cap disks, real miss");
+	ray = make_ray(0, 0, 5, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 1.0)
+		&& feq(hit.normal.z, 1.0),
+		"camera on the axis: inner wall at t = 1, outward normal");
+	ray = make_ray(0, 10, 5, (t_vector){0, -1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 8.0)
+		&& feq(hit.normal.y, 1.0) && feq(hit.point.y, 2.0),
+		"end-on from above: top cap at t = 8, normal +A");
+	ray = make_ray(1.5, -10, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"parallel to axis, outside radius: disk check rejects");
+	ray = make_ray(0, 4, 5, (t_vector){0, -1, 0.2});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.y, 1.0),
+		"three-way min: top cap (t = 2) beats far body wall (t = 5)");
+	ray = make_ray(0, 0, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.y, 2.0),
+		"inside, looking along the axis: cap closes the solid");
+}
+
+static void	test_hit_anything(void)
+{
+	t_scene		s;
+	t_object	obj;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- hit_anything (closest-hit loop) ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){0.0, 1.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 10}, 3.0};
+	add_object(&s, obj);
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&s, obj);
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(hit_anything(ray, &s, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.object->color.x, 1.0),
+		"two spheres on the ray: nearest wins (red, t = 4)");
+	ray = make_ray(0, 0, 0, (t_vector){0, 1, 0});
+	check(hit_anything(ray, &s, &hit) == 0, "ray missing all: 0");
+	free_objects(&s);
+	check(1, "note: green was FIRST in the list and still lost");
+}
+
+static unsigned int	buf_pixel(t_data *d, int x, int y)
+{
+	return (*(unsigned int *)(d->addr
+			+ (y * d->line_length + x * (d->bits_per_pixel / 8))));
+}
+
+static void	test_headless_render(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless full-frame render ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.position = (t_vector){0, 0, 0};
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){0.0, 1.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 10}, 3.0};
+	add_object(&d.scene, obj);
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	obj.type = PLANE;
+	obj.color = (t_color){0.0, 0.0, 1.0};
+	obj.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF0000,
+		"center pixel: red sphere occludes green");
+	check(buf_pixel(&d, WIDTH / 2, 3 * HEIGHT / 8) == 0x00FF00,
+		"ring pixel: green sphere visible around red");
+	check(buf_pixel(&d, 0, 0) != 0xFF0000
+		&& buf_pixel(&d, 0, 0) != 0x00FF00,
+		"corner pixel: background, no object");
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 8) == 0x0000FF,
+		"floor plane rendered (top of frame: basis flip, module 3)");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
+static void	test_headless_shapes(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless: shape edge cases ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = CYLINDER;
+	obj.color = (t_color){1.0, 1.0, 0.0};
+	obj.shape.cylinder = (t_cylinder){(t_vector){0, 0, 5},
+		(t_vector){0, 0, 1}, 1.0, 2.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFFFF00,
+		"end-on cylinder: near cap fills the center pixel");
+	free_objects(&d.scene);
+	obj.type = SPHERE;
+	obj.color = (t_color){1.0, 0.0, 1.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 0}, 10.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF00FF
+		&& buf_pixel(&d, 0, 0) == 0xFF00FF
+		&& buf_pixel(&d, WIDTH - 1, HEIGHT - 1) == 0xFF00FF,
+		"camera inside a sphere: inner wall covers the whole frame");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
 static void	test_vectors(void)
 {
 	t_vector	a;
@@ -339,6 +582,12 @@ int	main(void)
 	test_cylinder();
 	test_end_to_end();
 	test_object_list();
+	test_intersect_sphere();
+	test_intersect_plane();
+	test_intersect_cylinder();
+	test_hit_anything();
+	test_headless_render();
+	test_headless_shapes();
 	test_vectors();
 	printf("========================================\n");
 	if (g_fail == 0)

@@ -6,7 +6,7 @@
 #    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/09 14:57:41 by edefoy           ###   ########.fr        #
+#    Updated: 2026/07/10 20:00:57 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,6 +57,10 @@ SRC         := main.c \
                Image/renderer.c \
                Image/color.c \
                Rayon/rayon.c \
+               Intersections/intersect_cylinder.c \
+               Intersections/intersect_plane.c \
+               Intersections/intersect_sphere.c \
+               Intersections/hit_scene.c \
                Parsing/parse_line.c \
                Parsing/parse_utils.c \
                Parsing/parse_ambient.c \
