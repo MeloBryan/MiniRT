@@ -309,6 +309,116 @@ static void	test_object_list(void)
 	check(1, "double free_objects is harmless");
 }
 
+static t_ray	make_ray(double ox, double oy, double oz, t_vector dir)
+{
+	t_ray	ray;
+
+	ray.origin = (t_vector){ox, oy, oz};
+	ray.direction = dir;
+	return (ray);
+}
+
+static void	test_intersect_sphere(void)
+{
+	t_object	sp;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_sphere ---\n");
+	ft_bzero(&sp, sizeof(t_object));
+	sp.type = SPHERE;
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.point.z, 4.0) && feq(hit.normal.z, -1.0)
+		&& hit.object == &sp,
+		"frontal hit: t = 4, point (0,0,4), normal (0,0,-1)");
+	ray = make_ray(0, 5, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 0, "clear miss");
+	ray = make_ray(0, 1, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 5.0)
+		&& feq(hit.normal.y, 1.0),
+		"tangent ray: disc = 0, one grazing hit at t = 5");
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, -1});
+	check(intersect_sphere(ray, &sp, &hit) == 0,
+		"sphere behind the ray: both roots negative, miss");
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 0}, 2.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.z, 1.0),
+		"camera inside: near root rejected, exit hit at t = 2");
+	sp.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 2});
+	check(intersect_sphere(ray, &sp, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.z, 4.0),
+		"non-unit direction: t halves, same world point");
+}
+
+static void	test_hit_anything(void)
+{
+	t_scene		s;
+	t_object	obj;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- hit_anything (closest-hit loop) ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){0.0, 1.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 10}, 3.0};
+	add_object(&s, obj);
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&s, obj);
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(hit_anything(ray, &s, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.object->color.x, 1.0),
+		"two spheres on the ray: nearest wins (red, t = 4)");
+	ray = make_ray(0, 0, 0, (t_vector){0, 1, 0});
+	check(hit_anything(ray, &s, &hit) == 0, "ray missing all: 0");
+	free_objects(&s);
+	check(1, "note: green was FIRST in the list and still lost");
+}
+
+static unsigned int	buf_pixel(t_data *d, int x, int y)
+{
+	return (*(unsigned int *)(d->addr
+			+ (y * d->line_length + x * (d->bits_per_pixel / 8))));
+}
+
+static void	test_headless_render(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless full-frame render ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.position = (t_vector){0, 0, 0};
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){0.0, 1.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 10}, 3.0};
+	add_object(&d.scene, obj);
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF0000,
+		"center pixel: red sphere occludes green");
+	check(buf_pixel(&d, WIDTH / 2, 3 * HEIGHT / 8) == 0x00FF00,
+		"ring pixel: green sphere visible around red");
+	check(buf_pixel(&d, 0, 0) != 0xFF0000
+		&& buf_pixel(&d, 0, 0) != 0x00FF00,
+		"corner pixel: background, no object");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
 static void	test_vectors(void)
 {
 	t_vector	a;
@@ -339,6 +449,9 @@ int	main(void)
 	test_cylinder();
 	test_end_to_end();
 	test_object_list();
+	test_intersect_sphere();
+	test_hit_anything();
+	test_headless_render();
 	test_vectors();
 	printf("========================================\n");
 	if (g_fail == 0)
