@@ -13,7 +13,7 @@
 #ifndef IMAGE_H
 # define IMAGE_H
 
-# include "miniRT.h"
+# include "structures.h"
 
 /*
 ** t_data now holds ONLY the MLX plumbing, plus the scene it displays.

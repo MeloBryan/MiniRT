@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.h"
+#include "miniRT.h"
 
 void	free_data(t_data *data)
 {

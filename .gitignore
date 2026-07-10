@@ -1,6 +1,7 @@
 # Binaries
 MiniRT
 miniRT
+test_parsing
 
 # Object files and dependency files
 objs/
@@ -9,10 +10,10 @@ objs/
 *.a
 
 # MiniLibX build artifacts (if you vendor the sources)
-minilibx_linux/*.o
-minilibx_linux/*.a
-minilibx_linux/*.gen
-minilibx_linux/Makefile.gen
+minilibx-linux/*.o
+minilibx-linux/*.a
+minilibx-linux/*.gen
+minilibx-linux/Makefile.gen
 
 # Editor / OS noise
 .vscode/

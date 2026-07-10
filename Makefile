@@ -23,7 +23,7 @@ NAME        := MiniRT
 LIBFT_DIR   := libft
 LIBFT       := $(LIBFT_DIR)/libft.a
 
-MLX_DIR     := minilibx_linux
+MLX_DIR     := minilibx-linux
 MLX         := $(MLX_DIR)/libmlx.a
 
 # ---------------------------------------------------------------------------- #
@@ -37,7 +37,7 @@ MLX         := $(MLX_DIR)/libmlx.a
 
 CC          := cc
 CFLAGS      := -Wall -Wextra -Werror -O3
-CPPFLAGS    := -Iincludes -I$(MLX_DIR) -MMD -MP
+CPPFLAGS    := -Iincludes -I$(MLX_DIR) -Ilibft/includes -MMD -MP
 LDFLAGS     := -L$(LIBFT_DIR) -L$(MLX_DIR)
 LDLIBS      := -lft -lmlx -lXext -lX11 -lm
 
@@ -115,10 +115,21 @@ $(LIBFT):
 	@echo "==> building libft"
 	@$(MAKE) -C $(LIBFT_DIR)
 
-# Build only the library (Makefile.gen), not MiniLibX's demo programs:
-# the demos need extra libs (-lbsd) and their failure would break our build.
+# Build only the MiniLibX LIBRARY, never its demo programs: the demos
+# need extra libs (-lbsd) and their failure would break our build.
+# Recent MLX ships Makefile.gen as a template (Makefile.mk); we generate
+# it exactly like ./configure does, minus the demo step.
 $(MLX):
+	@if [ ! -d $(MLX_DIR) ]; then \
+		echo "==> $(MLX_DIR)/ is missing. Clone it first:"; \
+		echo "==>   git clone https://github.com/42Paris/minilibx-linux.git"; \
+		exit 1; \
+	fi
 	@echo "==> building minilibx"
+	@if [ ! -f $(MLX_DIR)/Makefile.gen ]; then \
+		echo "INC=/usr/include" > $(MLX_DIR)/Makefile.gen; \
+		grep -v '%%%%' $(MLX_DIR)/Makefile.mk >> $(MLX_DIR)/Makefile.gen; \
+	fi
 	@$(MAKE) -C $(MLX_DIR) -f Makefile.gen all
 
 bonus: all
