@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:13:35 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/09 12:56:21 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/10 14:35:12 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,20 @@ typedef struct s_object
 	t_shape			shape;
 	struct s_object	*next;
 }				t_object;
+
+/*
+** The result of a successful ray/object intersection.
+** t is the distance along the ray (P = origin + t * direction);
+** point is that position in world space; normal is the unit surface
+** normal at that point; object identifies what was hit (its color).
+*/
+typedef struct s_hit
+{
+	double		t;
+	t_vector	point;
+	t_vector	normal;
+	t_object	*object;
+}				t_hit;
 
 /*
 ** The full scene description, filled by parsing, read by rendering.

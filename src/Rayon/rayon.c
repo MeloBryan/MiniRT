@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:16:11 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/09 13:10:59 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/10 14:46:58 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,9 @@ void	update_camera_vectors(t_basis *basis, t_data *data)
 	world_up.z = 0.0;
 	basis->r = normalization(cross_vec(basis->f, world_up));
 	basis->u = cross_vec(basis->f, basis->r);
+}
+
+t_vector	ray_at(t_ray ray, double t)
+{
+	return (add_vec(ray.origin, mul_vec(ray.direction, t)));
 }
