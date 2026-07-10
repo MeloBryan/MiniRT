@@ -410,15 +410,31 @@ static void	test_intersect_cylinder(void)
 	check(intersect_cylinder(ray, &cy, &hit) == 0,
 		"just above the height (m = 2.1 > h/2): miss");
 	ray = make_ray(0.5, -10, 5, (t_vector){0, 1, 0});
-	check(intersect_cylinder(ray, &cy, &hit) == 0,
-		"ray parallel to axis: a = 0 guard, body miss");
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 8.0)
+		&& feq(hit.normal.y, -1.0),
+		"parallel to axis, inside radius: bottom cap at t = 8 (was miss)");
 	ray = make_ray(0, 4, 5, (t_vector){0, -1, 1});
 	check(intersect_cylinder(ray, &cy, &hit) == 0,
-		"exit above the rim: body miss (cap territory, 2.6)");
+		"passes over the rim: outside both cap disks, real miss");
 	ray = make_ray(0, 0, 5, (t_vector){0, 0, 1});
 	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 1.0)
 		&& feq(hit.normal.z, 1.0),
 		"camera on the axis: inner wall at t = 1, outward normal");
+	ray = make_ray(0, 10, 5, (t_vector){0, -1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 8.0)
+		&& feq(hit.normal.y, 1.0) && feq(hit.point.y, 2.0),
+		"end-on from above: top cap at t = 8, normal +A");
+	ray = make_ray(1.5, -10, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"parallel to axis, outside radius: disk check rejects");
+	ray = make_ray(0, 4, 5, (t_vector){0, -1, 0.2});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.y, 1.0),
+		"three-way min: top cap (t = 2) beats far body wall (t = 5)");
+	ray = make_ray(0, 0, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.y, 2.0),
+		"inside, looking along the axis: cap closes the solid");
 }
 
 static void	test_hit_anything(void)
