@@ -388,6 +388,39 @@ static void	test_intersect_plane(void)
 		"seen from below: t = 3, normal flipped down");
 }
 
+static void	test_intersect_cylinder(void)
+{
+	t_object	cy;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_cylinder (body) ---\n");
+	ft_bzero(&cy, sizeof(t_object));
+	cy.type = CYLINDER;
+	cy.shape.cylinder = (t_cylinder){(t_vector){0, 0, 5},
+		(t_vector){0, 1, 0}, 1.0, 4.0};
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 4.0)
+		&& feq(hit.point.z, 4.0) && feq(hit.normal.z, -1.0),
+		"frontal hit: t = 4, radial normal (0,0,-1)");
+	ray = make_ray(0, 1.9, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 4.0),
+		"just inside the height (m = 1.9 < h/2): hit");
+	ray = make_ray(0, 2.1, 0, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"just above the height (m = 2.1 > h/2): miss");
+	ray = make_ray(0.5, -10, 5, (t_vector){0, 1, 0});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"ray parallel to axis: a = 0 guard, body miss");
+	ray = make_ray(0, 4, 5, (t_vector){0, -1, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 0,
+		"exit above the rim: body miss (cap territory, 2.6)");
+	ray = make_ray(0, 0, 5, (t_vector){0, 0, 1});
+	check(intersect_cylinder(ray, &cy, &hit) == 1 && feq(hit.t, 1.0)
+		&& feq(hit.normal.z, 1.0),
+		"camera on the axis: inner wall at t = 1, outward normal");
+}
+
 static void	test_hit_anything(void)
 {
 	t_scene		s;
@@ -491,6 +524,7 @@ int	main(void)
 	test_object_list();
 	test_intersect_sphere();
 	test_intersect_plane();
+	test_intersect_cylinder();
 	test_hit_anything();
 	test_headless_render();
 	test_vectors();
