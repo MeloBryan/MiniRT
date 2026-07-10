@@ -1,6 +1,6 @@
 # miniRT — Project State & Roadmap (proto-README)
 
-> Working document, milestone 2 (foundation + scene model complete).
+> Working document, milestone 3 (foundation + scene model + intersections complete).
 > Will be trimmed into the final `README.md` required by the subject
 > (first line with logins, Description / Instructions / Resources sections).
 
@@ -96,9 +96,17 @@ single division for planes.
 
 ## 3. What it cannot do yet (honest list)
 
-- **Objects are parsed but not rendered.** The scene list is filled and
-  freed correctly, but the renderer still tests its one hardcoded
-  sphere; module 2 (intersections) connects the two.
+- **Flat colors only.** Every mandatory shape (sphere, plane, closed
+  cylinder) intersects and renders with its own color via the
+  closest-hit loop, but there is no lighting yet: no ambient, no
+  diffuse, no shadows. The A and L elements are parsed and unused.
+- **Camera basis is left-handed.** Images are rotated 180 degrees
+  (right = -x, up = -y); FOV is parsed but ignored. Both fixed by the
+  real-camera module. A camera pointing straight up or down (0,±1,0)
+  still degenerates (parallel to world_up).
+- **Normal orientation at shading.** Solids return geometric outward
+  normals; the flip toward the viewer for interior views is deferred
+  to the lighting module (planes already face the viewer).
 - **FOV is parsed but ignored.** The virtual screen sits at a fixed
   distance, giving an implicit ~90° field of view whatever the file says.
 - **Hit test is boolean.** The intersection returns hit/no-hit, not the
@@ -188,7 +196,7 @@ copy-paste speed). Ranges: low = things go smoothly, high = debugging.
 | # | Module | Content | Estimate |
 |---|--------|---------|----------|
 | 1 | ~~**Objects: parsing & storage**~~ | DONE — t_scene, tagged-union list, sp/pl/cy parsers, parse_direction, 62-check bench incl. subject example | ~~4–6 h~~ |
-| 2 | **Intersections** | Sphere returning distance t (two roots, nearest positive); plane (division + parallel case); cylinder: infinite body + height clamp + the two caps (the hardest math of the project); closest-hit loop over all objects | **8–12 h** |
+| 2 | ~~**Intersections**~~ | DONE — t_hit/ray_at, sphere quadratic, plane, cylinder tube + caps, closest-hit loop, headless pixel-asserted renders, 95-check bench | ~~8–12 h~~ |
 | 3 | **Real camera** | Use the parsed FOV (screen distance = f(tan(fov/2))); fix the straight-up/down camera degeneracy; render each object with its own color | **3–4 h** |
 | 4 | **Lighting** | Hit point + surface normal per object type (inside/outside!); ambient term; diffuse term (dot(normal, light_dir)); hard shadows via shadow ray + epsilon against acne | **6–8 h** |
 | 5 | **Hardening** | Strict numeric validation (reject "abc", "1.2.3", empty fields); normalized-vector checks; fuzz the parser with hostile scenes; full valgrind pass on every scene | **3–4 h** |

@@ -133,6 +133,16 @@ static void	test_files(void)
 	ft_bzero(&s, sizeof(t_scene));
 	check(parse_file("scenes/nope.rt", &s) == 0, "missing file rejected");
 	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/cylinder_endon.rt", &s) == 1
+		&& parse_file("scenes/cylinder_tilted.rt", &s) == 0,
+		"edge-case fixtures parse (2nd call: duplicate A rejected)");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_file("scenes/inside_sphere.rt", &s) == 1
+		&& s.objects->shape.sphere.radius == 10.0,
+		"inside-sphere fixture: camera sits within radius 10");
+	free_objects(&s);
+	ft_bzero(&s, sizeof(t_scene));
 	check(parse_file("scenes/two_spheres.rt", &s) == 1
 		&& s.objects && s.objects->next && !s.objects->next->next
 		&& feq(s.objects->shape.sphere.radius, 6.3)
@@ -508,6 +518,40 @@ static void	test_headless_render(void)
 	free(d.addr);
 }
 
+static void	test_headless_shapes(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless: shape edge cases ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = CYLINDER;
+	obj.color = (t_color){1.0, 1.0, 0.0};
+	obj.shape.cylinder = (t_cylinder){(t_vector){0, 0, 5},
+		(t_vector){0, 0, 1}, 1.0, 2.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFFFF00,
+		"end-on cylinder: near cap fills the center pixel");
+	free_objects(&d.scene);
+	obj.type = SPHERE;
+	obj.color = (t_color){1.0, 0.0, 1.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 0}, 10.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF00FF
+		&& buf_pixel(&d, 0, 0) == 0xFF00FF
+		&& buf_pixel(&d, WIDTH - 1, HEIGHT - 1) == 0xFF00FF,
+		"camera inside a sphere: inner wall covers the whole frame");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
 static void	test_vectors(void)
 {
 	t_vector	a;
@@ -543,6 +587,7 @@ int	main(void)
 	test_intersect_cylinder();
 	test_hit_anything();
 	test_headless_render();
+	test_headless_shapes();
 	test_vectors();
 	printf("========================================\n");
 	if (g_fail == 0)

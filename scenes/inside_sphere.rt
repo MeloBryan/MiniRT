@@ -1,0 +1,6 @@
+# camera INSIDE a large sphere: the whole frame must be its inner
+# wall (magenta), no background visible anywhere
+A 0.2 255,255,255
+C 0,0,0 0,0,1 70
+L 0,5,0 0.7 255,255,255
+sp 0,0,0 20 255,0,255
