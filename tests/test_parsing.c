@@ -354,6 +354,40 @@ static void	test_intersect_sphere(void)
 		"non-unit direction: t halves, same world point");
 }
 
+static void	test_intersect_plane(void)
+{
+	t_object	pl;
+	t_hit		hit;
+	t_ray		ray;
+
+	printf("--- intersect_plane ---\n");
+	ft_bzero(&pl, sizeof(t_object));
+	pl.type = PLANE;
+	pl.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	ray = make_ray(0, 0, 0, (t_vector){0, -1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.point.y, -2.0) && feq(hit.normal.y, 1.0),
+		"floor below: t = 2, point (0,-2,0), normal up");
+	ray = make_ray(0, 0, 0, (t_vector){1, 0, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"parallel ray (D.N = 0): miss, no division blowup");
+	ray = make_ray(0, -2, 0, (t_vector){1, 0, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"ray lying inside the plane: edge-on, miss");
+	ray = make_ray(0, 0, 0, (t_vector){0, 1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 0,
+		"plane behind the ray: t < 0, miss");
+	pl.shape.plane.normal = (t_vector){0, -1, 0};
+	ray = make_ray(0, 0, 0, (t_vector){0, -1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 2.0)
+		&& feq(hit.normal.y, 1.0),
+		"stored normal faces away: flipped toward the viewer");
+	ray = make_ray(3, -5, 7, (t_vector){0, 1, 0});
+	check(intersect_plane(ray, &pl, &hit) == 1 && feq(hit.t, 3.0)
+		&& feq(hit.point.x, 3.0) && feq(hit.normal.y, -1.0),
+		"seen from below: t = 3, normal flipped down");
+}
+
 static void	test_hit_anything(void)
 {
 	t_scene		s;
@@ -407,6 +441,10 @@ static void	test_headless_render(void)
 	obj.color = (t_color){1.0, 0.0, 0.0};
 	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
 	add_object(&d.scene, obj);
+	obj.type = PLANE;
+	obj.color = (t_color){0.0, 0.0, 1.0};
+	obj.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	add_object(&d.scene, obj);
 	render_scene(&d);
 	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF0000,
 		"center pixel: red sphere occludes green");
@@ -415,6 +453,8 @@ static void	test_headless_render(void)
 	check(buf_pixel(&d, 0, 0) != 0xFF0000
 		&& buf_pixel(&d, 0, 0) != 0x00FF00,
 		"corner pixel: background, no object");
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 8) == 0x0000FF,
+		"floor plane rendered (top of frame: basis flip, module 3)");
 	free_objects(&d.scene);
 	free(d.addr);
 }
@@ -450,6 +490,7 @@ int	main(void)
 	test_end_to_end();
 	test_object_list();
 	test_intersect_sphere();
+	test_intersect_plane();
 	test_hit_anything();
 	test_headless_render();
 	test_vectors();

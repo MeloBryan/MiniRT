@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/10 15:00:02 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/10 15:05:52 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/10 15:54:18 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ static int	intersect_object(t_ray ray, t_object *obj, t_hit *hit)
 {
 	if (obj->type == SPHERE)
 		return (intersect_sphere(ray, obj, hit));
+	if (obj->type == PLANE)
+		return (intersect_plane(ray, obj, hit));
 	return (0);
 }
 
