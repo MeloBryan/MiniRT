@@ -6,23 +6,11 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 15:17:46 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/11 15:25:34 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 16:07:20 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
-
-static int	background_color(t_ray ray)
-{
-	int	r;
-	int	g;
-	int	b;
-
-	r = (int)((ray.direction.x + 1.0) * 127.5);
-	g = (int)((ray.direction.y + 1.0) * 127.5);
-	b = (int)((ray.direction.z + 1.0) * 127.5);
-	return ((r << 16) | (g << 8) | b);
-}
 
 static void	render_pixel(t_data *data, t_basis basis, int x, int y)
 {
@@ -35,9 +23,10 @@ static void	render_pixel(t_data *data, t_basis basis, int x, int y)
 	screen.z = 0.0;
 	ray = ray_init(screen, basis, data);
 	if (hit_anything(ray, &data->scene, &hit))
-		my_mlx_pixel_put(data, x, y, color_to_int(hit.object->color));
+		my_mlx_pixel_put(data, x, y,
+			color_to_int(shade_hit(&data->scene, ray, &hit)));
 	else
-		my_mlx_pixel_put(data, x, y, background_color(ray));
+		my_mlx_pixel_put(data, x, y, 0x000000);
 }
 
 void	render_scene(t_data *data)
