@@ -493,6 +493,8 @@ static void	test_headless_render(void)
 	d.scene.camera.position = (t_vector){0, 0, 0};
 	d.scene.camera.direction = (t_vector){0, 0, 1};
 	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 1.0;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
 	ft_bzero(&obj, sizeof(t_object));
 	obj.type = SPHERE;
 	obj.color = (t_color){0.0, 1.0, 0.0};
@@ -561,6 +563,8 @@ static void	test_headless_zoom(void)
 	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
 	d.scene.camera.direction = (t_vector){0, 0, 1};
 	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 1.0;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
 	ft_bzero(&obj, sizeof(t_object));
 	obj.type = SPHERE;
 	obj.color = (t_color){0.0, 1.0, 0.0};
@@ -589,6 +593,165 @@ static void	test_headless_zoom(void)
 	free(d.addr);
 }
 
+static void	test_shading(void)
+{
+	t_scene		s;
+	t_object	red;
+	t_hit		hit;
+	t_ray		ray;
+	t_color		c;
+
+	printf("--- shade_hit (ambient + Lambert) ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	ft_bzero(&red, sizeof(t_object));
+	red.color = (t_color){1.0, 0.0, 0.0};
+	s.ambient.ratio = 0.2;
+	s.ambient.color = (t_color){1.0, 1.0, 1.0};
+	s.light.ratio = 0.5;
+	hit.point = (t_vector){0, 0, 4};
+	hit.normal = (t_vector){0, 0, -1};
+	hit.object = &red;
+	ray = make_ray(0, 0, 0, (t_vector){0, 0, 1});
+	s.light.position = (t_vector){0, 0, 10};
+	c = shade_hit(&s, ray, &hit);
+	check(feq(c.x, 0.2) && feq(c.y, 0.0) && feq(c.z, 0.0),
+		"light behind the surface: ambient only (0.2, 0, 0)");
+	s.light.position = (t_vector){0, 0, 0};
+	c = shade_hit(&s, ray, &hit);
+	check(feq(c.x, 0.7), "light dead-on: 0.2 + 0.5 * cos(0) = 0.7");
+	s.light.position = (t_vector){0, 4, 0};
+	c = shade_hit(&s, ray, &hit);
+	check(feq(c.x, 0.2 + 0.5 / sqrt(2.0)),
+		"light at 45 degrees: 0.2 + 0.5 * cos(45)");
+	hit.normal = (t_vector){0, 0, 1};
+	hit.point = (t_vector){0, 0, 2};
+	s.light.position = (t_vector){0, 0, 0};
+	c = shade_hit(&s, ray, &hit);
+	check(feq(c.x, 0.7),
+		"interior view: outward normal flipped, surface still lit");
+	s.ambient.color = (t_color){0.0, 0.0, 1.0};
+	s.ambient.ratio = 0.4;
+	s.light.ratio = 0.0;
+	c = shade_hit(&s, ray, &hit);
+	check(feq(c.x, 0.0) && feq(c.z, 0.0),
+		"red object under pure blue ambient: reflects nothing");
+}
+
+static void	test_shadows(void)
+{
+	t_scene		s;
+	t_object	red;
+	t_object	blocker;
+	t_hit		hit;
+	t_color		c;
+
+	printf("--- hard shadows ---\n");
+	ft_bzero(&s, sizeof(t_scene));
+	ft_bzero(&red, sizeof(t_object));
+	red.color = (t_color){1.0, 0.0, 0.0};
+	s.ambient.ratio = 0.1;
+	s.ambient.color = (t_color){1.0, 1.0, 1.0};
+	s.light.ratio = 0.8;
+	s.light.position = (t_vector){0, 0, 0};
+	hit.point = (t_vector){0, 0, 4};
+	hit.normal = (t_vector){0, 0, -1};
+	hit.object = &red;
+	c = shade_hit(&s, make_ray(0, 0, 0, (t_vector){0, 0, 1}), &hit);
+	check(feq(c.x, 0.9), "no occluder: fully lit (0.1 + 0.8)");
+	ft_bzero(&blocker, sizeof(t_object));
+	blocker.type = SPHERE;
+	blocker.shape.sphere = (t_sphere){(t_vector){0, 0, 2}, 0.5};
+	add_object(&s, blocker);
+	c = shade_hit(&s, make_ray(0, 0, 0, (t_vector){0, 0, 1}), &hit);
+	check(feq(c.x, 0.1), "occluder between point and light: ambient only");
+	free_objects(&s);
+	blocker.shape.sphere = (t_sphere){(t_vector){0, 0, -3}, 1.0};
+	add_object(&s, blocker);
+	c = shade_hit(&s, make_ray(0, 0, 0, (t_vector){0, 0, 1}), &hit);
+	check(feq(c.x, 0.9), "occluder BEYOND the light: still lit");
+	free_objects(&s);
+	blocker.shape.sphere = (t_sphere){(t_vector){5, 0, 2}, 1.0};
+	add_object(&s, blocker);
+	c = shade_hit(&s, make_ray(0, 0, 0, (t_vector){0, 0, 1}), &hit);
+	check(feq(c.x, 0.9), "occluder beside the light path: still lit");
+	free_objects(&s);
+}
+
+static void	test_headless_shadow(void)
+{
+	t_data		d;
+	t_object	obj;
+	unsigned int	under;
+	unsigned int	away;
+
+	printf("--- headless: cast shadow on a floor ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 0.2;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
+	d.scene.light.position = (t_vector){0, 10, 6};
+	d.scene.light.ratio = 0.7;
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = PLANE;
+	obj.color = (t_color){1.0, 1.0, 1.0};
+	obj.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	add_object(&d.scene, obj);
+	obj.type = SPHERE;
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 6}, 1.5};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	under = buf_pixel(&d, WIDTH / 2, 2 * HEIGHT / 3);
+	away = buf_pixel(&d, 3 * WIDTH / 4, 2 * HEIGHT / 3);
+	check(under == 0x333333,
+		"floor under the sphere: shadowed, ambient only (0x333333)");
+	check((away & 0xFF) > 0x33 && (away & 0xFF) == ((away >> 16) & 0xFF),
+		"floor away from the sphere: lit, brighter, still gray");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
+static void	test_headless_shading(void)
+{
+	t_data		d;
+	t_object	obj;
+	unsigned int	center;
+	unsigned int	upper;
+
+	printf("--- headless: shaded sphere ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 0.2;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
+	d.scene.light.position = (t_vector){0, 10, 5};
+	d.scene.light.ratio = 0.8;
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	center = buf_pixel(&d, WIDTH / 2, HEIGHT / 2);
+	upper = buf_pixel(&d, WIDTH / 2, HEIGHT / 2 - 70);
+	check(center == 0x330000,
+		"center pixel: normal faces camera, light above -> ambient only");
+	check(((upper >> 16) & 0xFF) > ((center >> 16) & 0xFF)
+		&& (upper & 0xFF00FF) == (upper & 0xFF0000),
+		"upper pixel tilts toward the light: brighter, still pure red");
+	check(buf_pixel(&d, 10, 10) == 0x000000,
+		"background is black");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
 static void	test_headless_shapes(void)
 {
 	t_data		d;
@@ -601,6 +764,8 @@ static void	test_headless_shapes(void)
 	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
 	d.scene.camera.direction = (t_vector){0, 0, 1};
 	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 1.0;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
 	ft_bzero(&obj, sizeof(t_object));
 	obj.type = CYLINDER;
 	obj.color = (t_color){1.0, 1.0, 0.0};
@@ -661,6 +826,10 @@ int	main(void)
 	test_headless_render();
 	test_camera();
 	test_headless_zoom();
+	test_shading();
+	test_shadows();
+	test_headless_shadow();
+	test_headless_shading();
 	test_headless_shapes();
 	test_vectors();
 	printf("========================================\n");

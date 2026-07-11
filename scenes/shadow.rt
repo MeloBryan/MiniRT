@@ -1,0 +1,7 @@
+# a sphere floating over a white floor, lit from high above:
+# a hard shadow disc must appear on the floor under the sphere
+A 0.2 255,255,255
+C 0,1,-2 0,-0.15,1 80
+L 0,10,6 0.7 255,255,255
+pl 0,-2,0 0,1,0 255,255,255
+sp 0,0,6 3 255,0,0
