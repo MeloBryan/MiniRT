@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/10 19:58:39 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/11 15:31:29 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:31:14 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,13 +116,27 @@ static void	keep_closest(t_hit *best, t_hit *cand, int *found)
 	}
 }
 
+/*
+** The finite cylinder is body + top cap + bottom cap: collect every
+** valid candidate and keep the smallest t. Only the NEAREST valid
+** body root can matter: any valid cap hit lies laterally inside the
+** tube, hence between the tube roots, so it can never be beaten by
+** the far root when the near one is valid.
+*/
 int	intersect_cylinder(t_ray ray, t_object *obj, t_hit *hit)
 {
 	double	roots[2];
+	t_hit	cand;
+	int		found;
 
-	if (!solve_tube(ray, obj->shape.cylinder, roots))
-		return (0);
-	if (body_hit(ray, obj, roots[0], hit))
-		return (1);
-	return (body_hit(ray, obj, roots[1], hit));
+	found = 0;
+	if (solve_tube(ray, obj->shape.cylinder, roots)
+		&& (body_hit(ray, obj, roots[0], &cand)
+			|| body_hit(ray, obj, roots[1], &cand)))
+		keep_closest(hit, &cand, &found);
+	if (cap_hit(ray, obj, 1.0, &cand))
+		keep_closest(hit, &cand, &found);
+	if (cap_hit(ray, obj, -1.0, &cand))
+		keep_closest(hit, &cand, &found);
+	return (found);
 }

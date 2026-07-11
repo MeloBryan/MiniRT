@@ -21,8 +21,8 @@ int	parse_ambient(char *line, t_scene *scene)
 	tokens = ft_split_spaces(line);
 	if (matrix_length(tokens) != 3)
 		return (free_matrix(tokens), rt_error("Invalid Ambient light format"));
-	scene->ambient.ratio = ft_atof(tokens[1]);
-	if (scene->ambient.ratio < 0.0 || scene->ambient.ratio > 1.0)
+	if (!parse_double(tokens[1], &scene->ambient.ratio)
+		|| scene->ambient.ratio < 0.0 || scene->ambient.ratio > 1.0)
 		return (free_matrix(tokens),
 			rt_error("Ambient ratio must be between 0.0 and 1.0"));
 	if (!parse_color(tokens[2], &scene->ambient.color))

@@ -27,8 +27,8 @@ int	parse_camera(char *line, t_scene *scene)
 	if (!parse_direction(tokens[2], &scene->camera.direction))
 		return (free_matrix(tokens),
 			rt_error("DIRECTION must be 3 values in [-1,1], not all zero"));
-	scene->camera.fov = ft_atof(tokens[3]);
-	if (scene->camera.fov < 0 || scene->camera.fov > 180)
+	if (!parse_double(tokens[3], &scene->camera.fov)
+		|| scene->camera.fov < 0 || scene->camera.fov > 180)
 		return (free_matrix(tokens),
 			rt_error("FOV value must be between 0 and 180"));
 	scene->camera_set = 1;

@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 15:12:25 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:28:34 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:25:18 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ int	parse_vec3(char *token, t_vector *vec)
 	parts = ft_split(token, ',');
 	if (matrix_length(parts) != 3)
 		return (free_matrix(parts), 0);
-	vec->x = ft_atof(parts[0]);
-	vec->y = ft_atof(parts[1]);
-	vec->z = ft_atof(parts[2]);
+	if (!parse_double(parts[0], &vec->x) || !parse_double(parts[1], &vec->y)
+		|| !parse_double(parts[2], &vec->z))
+		return (free_matrix(parts), 0);
 	free_matrix(parts);
 	return (1);
 }
@@ -51,6 +51,9 @@ int	parse_color(char *token, t_color *color)
 
 	parts = ft_split(token, ',');
 	if (matrix_length(parts) != 3)
+		return (free_matrix(parts), 0);
+	if (!is_valid_int(parts[0]) || !is_valid_int(parts[1])
+		|| !is_valid_int(parts[2]))
 		return (free_matrix(parts), 0);
 	rgb[0] = ft_atoi(parts[0]);
 	rgb[1] = ft_atoi(parts[1]);

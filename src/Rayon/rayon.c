@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:16:11 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/11 15:30:28 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:28:46 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	update_camera_vectors(t_basis *basis, t_data *data)
 		world_up.y = 0.0;
 		world_up.z = 1.0;
 	}
-	basis->r = normalization(cross_vec(basis->f, world_up));
+	basis->r = normalization(cross_vec(world_up, basis->f));
 	basis->u = cross_vec(basis->f, basis->r);
 	basis->half_w = tan(data->scene.camera.fov * M_PI / 360.0);
 	basis->half_h = basis->half_w * ((double)HEIGHT / (double)WIDTH);

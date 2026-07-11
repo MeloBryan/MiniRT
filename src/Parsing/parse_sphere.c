@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:59:22 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:41:00 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:23:09 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,11 @@ int	parse_sphere(char *line, t_scene *scene)
 	if (!parse_vec3(tokens[1], &obj.shape.sphere.center))
 		return (free_matrix(tokens),
 			rt_error("Sphere center must have 3 values (x,y,z)"));
-	obj.shape.sphere.radius = ft_atof(tokens[2]) / 2.0;
-	if (obj.shape.sphere.radius <= 0.0)
+	if (!parse_double(tokens[2], &obj.shape.sphere.radius)
+		|| obj.shape.sphere.radius <= 0.0)
 		return (free_matrix(tokens),
 			rt_error("Sphere diameter must be a positive value"));
+	obj.shape.sphere.radius /= 2.0;
 	if (!parse_color(tokens[3], &obj.color))
 		return (free_matrix(tokens),
 			rt_error("RGB color values must be between 0 and 255"));

@@ -6,11 +6,21 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 14:36:48 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/09 14:41:44 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:22:22 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
+
+static int	parse_cy_size(char **tokens, t_cylinder *cy)
+{
+	if (!parse_double(tokens[3], &cy->radius)
+		|| !parse_double(tokens[4], &cy->height)
+		|| cy->radius <= 0.0 || cy->height <= 0.0)
+		return (0);
+	cy->radius /= 2.0;
+	return (1);
+}
 
 int	parse_cylinder(char *line, t_scene *scene)
 {
@@ -27,9 +37,7 @@ int	parse_cylinder(char *line, t_scene *scene)
 	if (!parse_direction(tokens[2], &obj.shape.cylinder.axis))
 		return (free_matrix(tokens),
 			rt_error("Cylinder axis must be in [-1,1], not all zero"));
-	obj.shape.cylinder.radius = ft_atof(tokens[3]) / 2.0;
-	obj.shape.cylinder.height = ft_atof(tokens[4]);
-	if (obj.shape.cylinder.radius <= 0.0 || obj.shape.cylinder.height <= 0.0)
+	if (!parse_cy_size(tokens, &obj.shape.cylinder))
 		return (free_matrix(tokens),
 			rt_error("Cylinder diameter and height must be positive"));
 	if (!parse_color(tokens[5], &obj.color))

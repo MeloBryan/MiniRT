@@ -31,6 +31,9 @@ int			parse_direction(char *token, t_vector *vec);
 int			parse_color(char *token, t_color *color);
 int			check_extension(char *file_name);
 int			matrix_length(char **tokens);
+int			is_valid_double(char *str);
+int			is_valid_int(char *str);
+int			parse_double(char *token, double *out);
 
 t_object	*add_object(t_scene *scene, t_object obj);
 void		free_objects(t_scene *scene);

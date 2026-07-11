@@ -151,6 +151,40 @@ static void	test_files(void)
 	free_objects(&s);
 }
 
+static void	test_strict_numbers(void)
+{
+	t_scene	s;
+
+	printf("--- strict numeric validation ---\n");
+	check(is_valid_double("1") && is_valid_double("-0.5")
+		&& is_valid_double(".5") && is_valid_double("12.")
+		&& is_valid_double("+3.14"),
+		"valid forms accepted: 1, -0.5, .5, 12., +3.14");
+	check(!is_valid_double("") && !is_valid_double("-")
+		&& !is_valid_double(".") && !is_valid_double("abc")
+		&& !is_valid_double("1.2.3") && !is_valid_double("1e5")
+		&& !is_valid_double("--2") && !is_valid_double("12x"),
+		"garbage rejected: empty, -, ., abc, 1.2.3, 1e5, --2, 12x");
+	check(is_valid_int("255") && is_valid_int("-4") && !is_valid_int("1.0")
+		&& !is_valid_int("") && !is_valid_int("2x"),
+		"int grammar: 255 and -4 pass, 1.0 and 2x fail");
+	ft_bzero(&s, sizeof(t_scene));
+	check(parse_line("A abc 255,255,255", &s) == 0,
+		"ambient ratio 'abc' rejected (was silently 0.0)");
+	check(parse_line("C 0,0,zero 0,0,1 70", &s) == 0,
+		"camera position '0,0,zero' rejected");
+	check(parse_line("C 0,0,0 0,0,1 7O", &s) == 0,
+		"fov '7O' (letter O) rejected");
+	check(parse_line("sp 0,0,5 1.2.3 255,0,0", &s) == 0,
+		"sphere diameter '1.2.3' rejected");
+	check(parse_line("sp 0,0,5 4 25S,0,0", &s) == 0,
+		"RGB '25S' rejected");
+	check(parse_line("cy 0,0,5 0,1,0 2 4x 255,0,0", &s) == 0,
+		"cylinder height '4x' rejected");
+	check(s.objects == NULL, "no object created by any garbage line");
+	free_objects(&s);
+}
+
 static void	test_sphere(void)
 {
 	t_scene	s;
@@ -814,6 +848,7 @@ int	main(void)
 	test_duplicates();
 	test_dispatcher();
 	test_files();
+	test_strict_numbers();
 	test_sphere();
 	test_plane();
 	test_cylinder();
