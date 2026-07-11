@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/10 19:58:39 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/10 20:06:45 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 15:31:29 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ static int	cap_hit(t_ray ray, t_object *obj, double side, t_hit *hit)
 	t_vector	v;
 	double		denom;
 	double		t;
- 
+
 	cy = obj->shape.cylinder;
 	cap_c = add_vec(cy.center, mul_vec(cy.axis, side * cy.height / 2.0));
 	denom = dot_product(ray.direction, cy.axis);
@@ -106,7 +106,7 @@ static int	cap_hit(t_ray ray, t_object *obj, double side, t_hit *hit)
 	hit->object = obj;
 	return (1);
 }
- 
+
 static void	keep_closest(t_hit *best, t_hit *cand, int *found)
 {
 	if (!*found || cand->t < best->t)

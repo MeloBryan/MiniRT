@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 15:17:46 by edefoy            #+#    #+#             */
-/*   Updated: 2026/07/10 15:15:38 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 15:25:34 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,8 @@ static void	render_pixel(t_data *data, t_basis basis, int x, int y)
 	t_ray		ray;
 	t_hit		hit;
 
-	screen.x = (2.0 * ((double)x / WIDTH) - 1.0)
-		* ((double)WIDTH / (double)HEIGHT);
-	screen.y = 1.0 - 2.0 * ((double)y / HEIGHT);
+	screen.x = (2.0 * ((double)x / WIDTH) - 1.0) * basis.half_w;
+	screen.y = (1.0 - 2.0 * ((double)y / HEIGHT)) * basis.half_h;
 	screen.z = 0.0;
 	ray = ray_init(screen, basis, data);
 	if (hit_anything(ray, &data->scene, &hit))
