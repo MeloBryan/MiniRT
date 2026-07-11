@@ -6,7 +6,7 @@
 #    By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/08 14:17:41 by bmelo             #+#    #+#              #
-#    Updated: 2026/07/11 17:18:12 by edefoy           ###   ########.fr        #
+#    Updated: 2026/07/11 17:43:01 by edefoy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,6 +57,8 @@ SRC         := main.c \
                Image/renderer.c \
                Image/color.c \
                Image/lighting.c \
+               Image/transform.c \
+               Image/controls.c \
                Rayon/rayon.c \
                Intersections/intersect_cylinder.c \
                Intersections/intersect_plane.c \
@@ -79,7 +81,8 @@ SRC         := main.c \
                Vectors/Normalization.c \
                Vectors/Vec_Length.c \
                Vectors/Dot_Product.c \
-               Vectors/Cross_Vec.c
+               Vectors/Cross_Vec.c \
+               Vectors/Rotation.c
 
 SRCS        := $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS        := $(SRC:%.c=$(OBJ_DIR)/%.o)

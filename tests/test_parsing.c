@@ -823,6 +823,80 @@ static void	test_headless_shapes(void)
 	free(d.addr);
 }
 
+static void	test_transforms(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- transforms (5.2) ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	obj.type = PLANE;
+	obj.shape.plane = (t_plane){(t_vector){0, -2, 0}, (t_vector){0, 1, 0}};
+	add_object(&d.scene, obj);
+	check(feq(rot_y((t_vector){0, 0, 1}, M_PI / 2.0).x, 1.0)
+		&& feq(rot_x((t_vector){0, 1, 0}, M_PI / 2.0).z, 1.0),
+		"rot_y(+z, 90) = +x and rot_x(+y, 90) = +z");
+	d.selected = 0;
+	translate_target(&d, (t_vector){1, 0, 0});
+	check(feq(d.scene.camera.position.x, 1.0), "0 selects the camera");
+	d.selected = 1;
+	translate_target(&d, (t_vector){0, 2, 0});
+	check(feq(d.scene.light.position.y, 2.0), "1 selects the light");
+	d.selected = 2;
+	translate_target(&d, (t_vector){0, 0, -1});
+	check(feq(d.scene.objects->shape.sphere.center.z, 4.0),
+		"2 selects object #1 (union common initial sequence)");
+	rotate_target(&d, 'y', 90.0);
+	check(feq(d.scene.objects->shape.sphere.center.z, 4.0),
+		"rotating a sphere: no-op per the subject");
+	d.selected = 3;
+	rotate_target(&d, 'x', 90.0);
+	check(feq(d.scene.objects->next->shape.plane.normal.z, 1.0),
+		"plane normal rotated 90 around X: +y becomes +z, unit");
+	d.selected = 6;
+	translate_target(&d, (t_vector){9, 9, 9});
+	check(1, "selecting a missing object: safe no-op");
+	free_objects(&d.scene);
+}
+
+static void	test_headless_keys(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless: key-driven re-render ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
+	d.scene.ambient.ratio = 1.0;
+	d.scene.ambient.color = (t_color){1.0, 1.0, 1.0};
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){1.0, 0.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) == 0xFF0000,
+		"before keys: sphere at the center");
+	handle_input(TWO, &d);
+	handle_input(RIGHT, &d);
+	handle_input(RIGHT, &d);
+	handle_input(RIGHT, &d);
+	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 2) != 0xFF0000
+		&& feq(d.scene.objects->shape.sphere.center.x, 3.0),
+		"select + 3x RIGHT: sphere moved, image re-rendered");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
 static void	test_vectors(void)
 {
 	t_vector	a;
@@ -866,6 +940,8 @@ int	main(void)
 	test_headless_shadow();
 	test_headless_shading();
 	test_headless_shapes();
+	test_transforms();
+	test_headless_keys();
 	test_vectors();
 	printf("========================================\n");
 	if (g_fail == 0)

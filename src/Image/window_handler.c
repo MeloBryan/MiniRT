@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   window_handler.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmelo <bmelo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 14:39:18 by bmelo             #+#    #+#             */
-/*   Updated: 2026/06/09 17:30:52 by bmelo            ###   ########.fr       */
+/*   Updated: 2026/07/11 17:48:52 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,6 @@ void	open_win(t_data *data)
 	mlx_hook(data->win, 2, 1L << 0, (void *)handle_input, data);
 	mlx_hook(data->win, 17, 0, (void *)close_win, data);
 	mlx_loop(data->mlx);
-}
-
-void	handle_input(int key, t_data *data)
-{
-	if (key == ESC)
-		mlx_loop_end(data->mlx);
-	return ;
 }
 
 void	close_win(t_data *data)

@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 17:26:02 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/11 15:55:48 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 17:47:23 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define IMAGE_H
 
 # include "structures.h"
+
+# define TR_STEP 1.0
+# define ROT_STEP 5.0
 
 /*
 ** t_data now holds ONLY the MLX plumbing, plus the scene it displays.
@@ -29,6 +32,7 @@ typedef struct s_data
 	int			line_length;
 	int			endian;
 	int			key[65536];
+	int			selected;
 	t_scene		scene;
 }				t_data;
 
@@ -40,6 +44,8 @@ void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
 t_ray	ray_init(t_vector screen, t_basis basis, t_data *data);
 void	update_camera_vectors(t_basis *basis, t_data *data);
 int		color_to_int(t_color color);
+void	translate_target(t_data *data, t_vector delta);
+void	rotate_target(t_data *data, char axis, double deg);
 t_color	color_mul(t_color a, t_color b);
 t_color	shade_hit(t_scene *scene, t_ray ray, t_hit *hit);
 
