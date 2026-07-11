@@ -1,6 +1,6 @@
 # miniRT — Project State & Roadmap (proto-README)
 
-> Working document, milestone 4 (foundation + scene + intersections + real camera).
+> Working document, milestone 5 (mandatory rendering complete: scene, intersections, camera, lighting).
 > Will be trimmed into the final `README.md` required by the subject
 > (first line with logins, Description / Instructions / Resources sections).
 
@@ -96,13 +96,10 @@ single division for planes.
 
 ## 3. What it cannot do yet (honest list)
 
-- **Flat colors only.** Every mandatory shape (sphere, plane, closed
-  cylinder) intersects and renders with its own color via the
-  closest-hit loop, but there is no lighting yet: no ambient, no
-  diffuse, no shadows. The A and L elements are parsed and unused.
-- **Normal orientation at shading.** Solids return geometric outward
-  normals; the flip toward the viewer for interior views is deferred
-  to the lighting module (planes already face the viewer).
+- **No object transformations at runtime.** The subject requires
+  translation/rotation of objects, lights and cameras; scenes are
+  currently static once loaded (keys only close the window). Needs a
+  key-handling + re-render pass.
 - **FOV is parsed but ignored.** The virtual screen sits at a fixed
   distance, giving an implicit ~90° field of view whatever the file says.
 - **Hit test is boolean.** The intersection returns hit/no-hit, not the
@@ -194,7 +191,7 @@ copy-paste speed). Ranges: low = things go smoothly, high = debugging.
 | 1 | ~~**Objects: parsing & storage**~~ | DONE — t_scene, tagged-union list, sp/pl/cy parsers, parse_direction, 62-check bench incl. subject example | ~~4–6 h~~ |
 | 2 | ~~**Intersections**~~ | DONE — t_hit/ray_at, sphere quadratic, plane, cylinder tube + caps, closest-hit loop, headless pixel-asserted renders, 95-check bench | ~~8–12 h~~ |
 | 3 | ~~**Real camera**~~ | DONE — right-handed basis, horizontal FOV via tan(fov/2) precomputed in t_basis, vertical-camera fallback up, zoom pixel-asserted | ~~3–4 h~~ |
-| 4 | **Lighting** | Hit point + surface normal per object type (inside/outside!); ambient term; diffuse term (dot(normal, light_dir)); hard shadows via shadow ray + epsilon against acne | **6–8 h** |
+| 4 | ~~**Lighting**~~ | DONE — ambient + Lambert diffuse (white light per subject), interior normal flip at shading, hard shadows reusing hit_anything with the t < light_dist bound, pixel-exact tests | ~~6–8 h~~ |
 | 5 | **Hardening** | Strict numeric validation (reject "abc", "1.2.3", empty fields); normalized-vector checks; fuzz the parser with hostile scenes; full valgrind pass on every scene | **3–4 h** |
 | 6 | **Defense prep** | Scene set showcasing every feature and every error path; final README (subject chapter V: logins line, Description, Instructions, Resources + AI usage); dry-run explaining each formula | **2–3 h** |
 
