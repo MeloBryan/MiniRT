@@ -6,7 +6,7 @@
 /*   By: edefoy <edefoy@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:13:35 by bmelo             #+#    #+#             */
-/*   Updated: 2026/07/10 14:35:12 by edefoy           ###   ########.fr       */
+/*   Updated: 2026/07/11 15:23:45 by edefoy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ typedef struct s_basis
 	t_vector	f;
 	t_vector	r;
 	t_vector	u;
+	double		half_w;
+	double		half_h;
 }				t_basis;
 
 typedef struct s_ambient

@@ -492,6 +492,7 @@ static void	test_headless_render(void)
 	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
 	d.scene.camera.position = (t_vector){0, 0, 0};
 	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
 	ft_bzero(&obj, sizeof(t_object));
 	obj.type = SPHERE;
 	obj.color = (t_color){0.0, 1.0, 0.0};
@@ -512,8 +513,78 @@ static void	test_headless_render(void)
 	check(buf_pixel(&d, 0, 0) != 0xFF0000
 		&& buf_pixel(&d, 0, 0) != 0x00FF00,
 		"corner pixel: background, no object");
-	check(buf_pixel(&d, WIDTH / 2, HEIGHT / 8) == 0x0000FF,
-		"floor plane rendered (top of frame: basis flip, module 3)");
+	check(buf_pixel(&d, WIDTH / 2, 7 * HEIGHT / 8) == 0x0000FF
+		&& buf_pixel(&d, WIDTH / 2, HEIGHT / 8) != 0x0000FF,
+		"floor at the BOTTOM of the frame (handedness fixed)");
+	free_objects(&d.scene);
+	free(d.addr);
+}
+
+static void	test_camera(void)
+{
+	t_data	d;
+	t_basis	b;
+
+	printf("--- camera basis & FOV ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
+	update_camera_vectors(&b, &d);
+	check(feq(b.r.x, 1.0) && feq(b.u.y, 1.0) && feq(b.f.z, 1.0),
+		"looking +z: right = +x, up = +y (right-handed)");
+	check(feq(b.half_w, 1.0), "fov 90: half_w = tan(45) = 1");
+	d.scene.camera.fov = 40.0;
+	update_camera_vectors(&b, &d);
+	check(feq(b.half_w, tan(20.0 * M_PI / 180.0)),
+		"fov 40: half_w = tan(20 degrees)");
+	d.scene.camera.direction = (t_vector){0, 1, 0};
+	update_camera_vectors(&b, &d);
+	check(feq(vec_length(b.r), 1.0) && feq(vec_length(b.u), 1.0)
+		&& feq(dot_product(b.r, b.f), 0.0)
+		&& feq(dot_product(b.u, b.f), 0.0),
+		"straight up: orthonormal basis, no NaN");
+	d.scene.camera.direction = (t_vector){0, -1, 0};
+	update_camera_vectors(&b, &d);
+	check(b.r.x == b.r.x && feq(vec_length(b.u), 1.0),
+		"straight down: still finite and unit length");
+}
+
+static void	test_headless_zoom(void)
+{
+	t_data		d;
+	t_object	obj;
+
+	printf("--- headless: handedness & FOV zoom ---\n");
+	ft_bzero(&d, sizeof(t_data));
+	d.bits_per_pixel = 32;
+	d.line_length = WIDTH * 4;
+	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
+	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
+	ft_bzero(&obj, sizeof(t_object));
+	obj.type = SPHERE;
+	obj.color = (t_color){0.0, 1.0, 0.0};
+	obj.shape.sphere = (t_sphere){(t_vector){3, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	render_scene(&d);
+	check(buf_pixel(&d, 4 * WIDTH / 5, HEIGHT / 2) == 0x00FF00
+		&& buf_pixel(&d, WIDTH / 5, HEIGHT / 2) != 0x00FF00,
+		"sphere at world +x appears on the RIGHT of the image");
+	d.scene.camera.fov = 40.0;
+	render_scene(&d);
+	check(buf_pixel(&d, 4 * WIDTH / 5, HEIGHT / 2) != 0x00FF00,
+		"fov 40: the off-axis sphere leaves the frame (telephoto crop)");
+	free_objects(&d.scene);
+	obj.shape.sphere = (t_sphere){(t_vector){0, 0, 5}, 1.0};
+	add_object(&d.scene, obj);
+	d.scene.camera.fov = 90.0;
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2 + WIDTH / 8, HEIGHT / 2) != 0x00FF00,
+		"fov 90: pixel at +W/8 misses the centered sphere");
+	d.scene.camera.fov = 40.0;
+	render_scene(&d);
+	check(buf_pixel(&d, WIDTH / 2 + WIDTH / 8, HEIGHT / 2) == 0x00FF00,
+		"fov 40 zooms in: the same pixel now hits it");
 	free_objects(&d.scene);
 	free(d.addr);
 }
@@ -529,6 +600,7 @@ static void	test_headless_shapes(void)
 	d.line_length = WIDTH * 4;
 	d.addr = malloc((size_t)WIDTH * HEIGHT * 4);
 	d.scene.camera.direction = (t_vector){0, 0, 1};
+	d.scene.camera.fov = 90.0;
 	ft_bzero(&obj, sizeof(t_object));
 	obj.type = CYLINDER;
 	obj.color = (t_color){1.0, 1.0, 0.0};
@@ -587,6 +659,8 @@ int	main(void)
 	test_intersect_cylinder();
 	test_hit_anything();
 	test_headless_render();
+	test_camera();
+	test_headless_zoom();
 	test_headless_shapes();
 	test_vectors();
 	printf("========================================\n");
